@@ -279,7 +279,7 @@
 
         .param-label {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 5px;
             font-size: 0.9rem;
@@ -424,7 +424,7 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // 简单图标组件
+        // 图标组件
         const Icon = ({ type, size = 20 }) => {
             const icons = {
                 play: "▶",
@@ -449,7 +449,7 @@
 
         // 简单线图组件
         const SimpleLineChart = ({ data, lines }) => {
-            if (!data || data.length === 0) return <div className="simple-chart">No data</div>;
+            if (!data || data.length === 0) return <div className="simple-chart">暂无数据</div>;
             
             const maxY = Math.max(...data.flatMap(d => lines.map(line => d[line.key] || 0)));
             const minY = Math.min(...data.flatMap(d => lines.map(line => d[line.key] || 0)));
@@ -481,7 +481,7 @@
                             );
                         })}
                         
-                        {/* 简单网格线 */}
+                        {/* 网格线 */}
                         {[0, 25, 50, 75, 100].map(percent => {
                             const y = height - padding - (percent / 100) * (height - 2 * padding);
                             return (
@@ -535,6 +535,8 @@
                     title: "多智能体强化学习游乐场",
                     subtitle: "Multi-Agent Reinforcement Learning Playground",
                     description: "探索、学习、实验 - 交互式MARL教学与研究平台",
+                    
+                    // 导航和控制
                     overview: "概览",
                     training: "训练监控",
                     environment: "环境可视化",
@@ -545,21 +547,116 @@
                     reset: "重置环境",
                     export: "导出数据",
                     share: "分享配置",
+                    show: "显示",
+                    hide: "隐藏",
+                    
+                    // 面板标题
+                    algorithm_selection: "算法选择",
+                    environment_selection: "环境选择", 
+                    training_control: "训练控制",
+                    parameters: "参数设置",
+                    algorithm_parameters: "算法参数",
+                    environment_parameters: "环境参数",
+                    
+                    // 指标
                     episode: "回合",
                     reward: "平均奖励",
                     success_rate: "成功率",
                     exploration: "探索率",
                     convergence: "收敛度",
+                    status: "状态",
+                    
+                    // 算法名称
+                    MAPPO: "多智能体近端策略优化",
+                    QMIX: "单调值函数分解",
+                    MADDPG: "多智能体深度确定性策略梯度",
+                    MASAC: "多智能体软演员-评论家",
+                    
+                    // 环境名称
                     predator_prey: "捕食者-猎物",
                     traffic: "交通控制",
                     resource: "资源收集",
+                    
+                    // 状态
                     training_status: "训练中",
-                    stopped_status: "已停止"
+                    stopped_status: "已停止",
+                    active: "当前选中",
+                    available: "可选择",
+                    
+                    // 参数名称翻译
+                    lr_actor: "演员学习率",
+                    lr_critic: "评论家学习率",
+                    lr_alpha: "温度学习率",
+                    learning_rate: "学习率",
+                    gamma: "折扣因子",
+                    clip_ratio: "裁剪比率",
+                    entropy_coef: "熵系数",
+                    tau: "软更新参数",
+                    noise_std: "噪声标准差",
+                    alpha: "温度参数",
+                    epsilon: "探索率",
+                    epsilon_decay: "探索衰减",
+                    target_update: "目标网络更新",
+                    
+                    // 环境参数翻译
+                    num_predators: "捕食者数量",
+                    num_prey: "猎物数量",
+                    num_vehicles: "车辆数量",
+                    num_agents: "智能体数量",
+                    num_resources: "资源数量",
+                    grid_size: "网格大小",
+                    
+                    // 页面内容
+                    training_progress: "训练进度",
+                    current_status: "当前状态",
+                    progress: "进度",
+                    performance_metrics: "性能指标",
+                    exploration_convergence: "探索与收敛",
+                    environment_visualization: "环境可视化",
+                    environment_information: "环境信息",
+                    legend: "图例",
+                    advantages: "优势",
+                    limitations: "局限性",
+                    current_parameters: "当前参数",
+                    performance_analysis: "性能分析",
+                    parameter_impact: "参数影响",
+                    algorithm_comparison: "算法对比",
+                    
+                    // 算法类型
+                    on_policy: "在线策略",
+                    off_policy: "离线策略",
+                    policy_gradient: "策略梯度",
+                    value_based: "值函数",
+                    actor_critic: "演员-评论家",
+                    
+                    // 环境描述
+                    predator_prey_desc: "经典的多智能体合作/竞争场景，捕食者协调捕获猎物",
+                    traffic_desc: "多车辆交通路口协调，避免碰撞并高效通行",
+                    resource_desc: "多智能体资源竞争与合作，收集资源并合作共享",
+                    
+                    // 智能体类型
+                    predator: "捕食者",
+                    prey: "猎物",
+                    vehicle: "车辆",
+                    agent: "智能体",
+                    resource: "资源",
+                    
+                    // 提示信息
+                    no_data: "暂无数据",
+                    config_copied: "配置已复制到剪贴板",
+                    clipboard_not_supported: "浏览器不支持复制功能",
+                    
+                    // 参数影响说明
+                    lr_impact: "学习率影响：数值越高收敛越快但不稳定，越低收敛慢但稳定",
+                    gamma_impact: "折扣因子：接近1重视长期奖励，接近0重视短期奖励",
+                    exploration_impact: "探索与利用的平衡：过度探索收敛慢，探索不足易陷入局部最优"
                 },
                 en: {
                     title: "Multi-Agent Reinforcement Learning Playground",
                     subtitle: "多智能体强化学习游乐场",
                     description: "Explore, Learn, Experiment - Interactive MARL Teaching & Research Platform",
+                    
+                    // Navigation and controls
                     overview: "Overview",
                     training: "Training",
                     environment: "Environment",
@@ -570,16 +667,109 @@
                     reset: "Reset Environment",
                     export: "Export Data",
                     share: "Share Config",
+                    show: "Show",
+                    hide: "Hide",
+                    
+                    // Panel titles
+                    algorithm_selection: "Algorithm Selection",
+                    environment_selection: "Environment Selection",
+                    training_control: "Training Control",
+                    parameters: "Parameters",
+                    algorithm_parameters: "Algorithm Parameters",
+                    environment_parameters: "Environment Parameters",
+                    
+                    // Metrics
                     episode: "Episode",
                     reward: "Mean Reward",
                     success_rate: "Success Rate",
                     exploration: "Exploration Rate",
                     convergence: "Convergence",
+                    status: "Status",
+                    
+                    // Algorithm names
+                    MAPPO: "Multi-Agent Proximal Policy Optimization",
+                    QMIX: "Monotonic Value Function Factorisation",
+                    MADDPG: "Multi-Agent Deep Deterministic Policy Gradient",
+                    MASAC: "Multi-Agent Soft Actor-Critic",
+                    
+                    // Environment names
                     predator_prey: "Predator-Prey",
                     traffic: "Traffic Control",
                     resource: "Resource Collection",
+                    
+                    // Status
                     training_status: "Training",
-                    stopped_status: "Stopped"
+                    stopped_status: "Stopped",
+                    active: "Active",
+                    available: "Available",
+                    
+                    // Parameter names
+                    lr_actor: "Actor Learning Rate",
+                    lr_critic: "Critic Learning Rate",
+                    lr_alpha: "Alpha Learning Rate",
+                    learning_rate: "Learning Rate",
+                    gamma: "Discount Factor",
+                    clip_ratio: "Clip Ratio",
+                    entropy_coef: "Entropy Coefficient",
+                    tau: "Soft Update Parameter",
+                    noise_std: "Noise Standard Deviation",
+                    alpha: "Temperature Parameter",
+                    epsilon: "Exploration Rate",
+                    epsilon_decay: "Exploration Decay",
+                    target_update: "Target Network Update",
+                    
+                    // Environment parameters
+                    num_predators: "Number of Predators",
+                    num_prey: "Number of Prey",
+                    num_vehicles: "Number of Vehicles", 
+                    num_agents: "Number of Agents",
+                    num_resources: "Number of Resources",
+                    grid_size: "Grid Size",
+                    
+                    // Page content
+                    training_progress: "Training Progress",
+                    current_status: "Current Status",
+                    progress: "Progress",
+                    performance_metrics: "Performance Metrics",
+                    exploration_convergence: "Exploration & Convergence",
+                    environment_visualization: "Environment Visualization",
+                    environment_information: "Environment Information",
+                    legend: "Legend",
+                    advantages: "Advantages",
+                    limitations: "Limitations",
+                    current_parameters: "Current Parameters",
+                    performance_analysis: "Performance Analysis",
+                    parameter_impact: "Parameter Impact",
+                    algorithm_comparison: "Algorithm Comparison",
+                    
+                    // Algorithm types
+                    on_policy: "On-policy",
+                    off_policy: "Off-policy",
+                    policy_gradient: "Policy Gradient",
+                    value_based: "Value-based",
+                    actor_critic: "Actor-Critic",
+                    
+                    // Environment descriptions
+                    predator_prey_desc: "Classic multi-agent cooperative/competitive scenario where predators coordinate to catch prey",
+                    traffic_desc: "Multi-vehicle traffic intersection coordination, avoiding collisions and efficient passage",
+                    resource_desc: "Multi-agent resource competition and cooperation, collecting resources and cooperative sharing",
+                    
+                    // Agent types
+                    predator: "Predator",
+                    prey: "Prey",
+                    vehicle: "Vehicle",
+                    agent: "Agent",
+                    resource: "Resource",
+                    
+                    // Messages
+                    no_data: "No Data",
+                    config_copied: "Configuration copied to clipboard",
+                    clipboard_not_supported: "Clipboard not supported in this browser",
+                    
+                    // Parameter impact descriptions
+                    lr_impact: "Learning Rate Impact: Higher values lead to faster but less stable convergence, lower values ensure stability but slower learning",
+                    gamma_impact: "Discount Factor: Values close to 1 prioritize long-term rewards, lower values focus on immediate rewards",
+                    exploration_impact: "Balance between exploration and exploitation: Over-exploration slows convergence, under-exploration leads to local optima"
                 }
             };
 
@@ -636,8 +826,8 @@
 
             const algorithmInfo = {
                 MAPPO: {
-                    name: language === 'zh' ? "多智能体近端策略优化" : "Multi-Agent Proximal Policy Optimization",
-                    type: language === 'zh' ? "在线策略梯度" : "On-policy Policy Gradient",
+                    name: t.MAPPO,
+                    type: `${t.on_policy} ${t.policy_gradient}`,
                     advantages: language === 'zh' 
                         ? ["训练稳定", "样本效率较高", "理论基础扎实"]
                         : ["Stable training", "Good sample efficiency", "Strong theoretical foundation"],
@@ -647,8 +837,8 @@
                     color: "#3b82f6"
                 },
                 QMIX: {
-                    name: language === 'zh' ? "单调值函数分解" : "Monotonic Value Function Factorisation",
-                    type: language === 'zh' ? "离线值函数" : "Off-policy Value-based",
+                    name: t.QMIX,
+                    type: `${t.off_policy} ${t.value_based}`,
                     advantages: language === 'zh'
                         ? ["理论保证IGM", "样本效率高", "处理部分可观察性"]
                         : ["Theoretical IGM guarantee", "High sample efficiency", "Handles partial observability"],
@@ -658,8 +848,8 @@
                     color: "#10b981"
                 },
                 MADDPG: {
-                    name: language === 'zh' ? "多智能体深度确定性策略梯度" : "Multi-Agent Deep Deterministic Policy Gradient",
-                    type: language === 'zh' ? "离线演员-评论家" : "Off-policy Actor-Critic",
+                    name: t.MADDPG,
+                    type: `${t.off_policy} ${t.actor_critic}`,
                     advantages: language === 'zh'
                         ? ["处理连续动作", "适用混合环境", "非平稳性处理"]
                         : ["Handles continuous actions", "Works in mixed environments", "Addresses non-stationarity"],
@@ -669,8 +859,8 @@
                     color: "#f59e0b"
                 },
                 MASAC: {
-                    name: language === 'zh' ? "多智能体软演员-评论家" : "Multi-Agent Soft Actor-Critic",
-                    type: language === 'zh' ? "离线演员-评论家" : "Off-policy Actor-Critic",
+                    name: t.MASAC,
+                    type: `${t.off_policy} ${t.actor_critic}`,
                     advantages: language === 'zh'
                         ? ["自适应探索", "训练稳定", "样本效率高"]
                         : ["Adaptive exploration", "Stable training", "High sample efficiency"],
@@ -824,9 +1014,9 @@
                 const config = { algorithm, environment, params: params[algorithm] };
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(JSON.stringify(config, null, 2));
-                    alert(language === 'zh' ? '配置已复制到剪贴板' : 'Configuration copied to clipboard');
+                    alert(t.config_copied);
                 } else {
-                    alert(language === 'zh' ? '浏览器不支持复制功能' : 'Clipboard not supported in this browser');
+                    alert(t.clipboard_not_supported);
                 }
             };
 
@@ -849,7 +1039,7 @@
                                 className="btn"
                                 onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
                             >
-                                <Icon type="globe" /> {language === 'zh' ? 'EN' : '中文'}
+                                <Icon type="globe" /> {language === 'zh' ? 'English' : '中文'}
                             </button>
                             <a href="https://github.com/yourusername/marl-playground" target="_blank" rel="noopener noreferrer" className="btn">
                                 <Icon type="github" /> GitHub
@@ -883,7 +1073,7 @@
                             <div className="status-value" style={{ color: '#f59e0b' }}>{currentStats.exploration_rate.toFixed(1)}%</div>
                         </div>
                         <div className="status-card">
-                            <div className="status-label">Status</div>
+                            <div className="status-label">{t.status}</div>
                             <div className="status-value" style={{ color: isTraining ? '#10b981' : '#ef4444' }}>
                                 {isTraining ? <span className="animate-pulse">{t.training_status}</span> : t.stopped_status}
                             </div>
@@ -895,7 +1085,7 @@
                         {/* 算法选择 */}
                         <div className="panel">
                             <div className="panel-title">
-                                <Icon type="brain" /> Algorithm Selection
+                                <Icon type="brain" /> {t.algorithm_selection}
                             </div>
                             <div className="radio-group">
                                 {Object.keys(params).map(alg => (
@@ -920,7 +1110,7 @@
                         {/* 环境选择 */}
                         <div className="panel">
                             <div className="panel-title">
-                                <Icon type="users" /> Environment Selection
+                                <Icon type="users" /> {t.environment_selection}
                             </div>
                             <div className="radio-group">
                                 {Object.keys(envParams).map(env => (
@@ -934,7 +1124,7 @@
                                         <div>
                                             <strong>{t[env]}</strong>
                                             <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-                                                Grid: {envParams[env].grid_size}×{envParams[env].grid_size}
+                                                {t.grid_size}: {envParams[env].grid_size}×{envParams[env].grid_size}
                                             </div>
                                         </div>
                                     </label>
@@ -945,7 +1135,7 @@
                         {/* 训练控制 */}
                         <div className="panel">
                             <div className="panel-title">
-                                <Icon type="activity" /> Training Control
+                                <Icon type="activity" /> {t.training_control}
                             </div>
                             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                                 <button
@@ -961,32 +1151,32 @@
                                 </button>
                             </div>
                             <div>
-                                <strong>Current Algorithm:</strong> {algorithm}<br/>
-                                <strong>Environment:</strong> {t[environment]}<br/>
-                                <strong>Episode:</strong> {episode}
+                                <strong>{t.algorithm_selection}:</strong> {algorithm}<br/>
+                                <strong>{t.environment_selection}:</strong> {t[environment]}<br/>
+                                <strong>{t.episode}:</strong> {episode}
                             </div>
                         </div>
 
                         {/* 参数设置 */}
                         <div className="panel">
                             <div className="panel-title">
-                                <Icon type="settings" /> Parameters
+                                <Icon type="settings" /> {t.parameters}
                                 <button 
                                     className="btn" 
                                     onClick={() => setShowSettings(!showSettings)}
                                     style={{ marginLeft: 'auto', padding: '5px 10px' }}
                                 >
-                                    {showSettings ? 'Hide' : 'Show'}
+                                    {showSettings ? t.hide : t.show}
                                 </button>
                             </div>
                             {showSettings && (
                                 <div className="param-controls">
                                     <div className="param-group">
-                                        <h4 style={{ marginBottom: '10px', color: '#60a5fa' }}>Algorithm Parameters</h4>
+                                        <h4 style={{ marginBottom: '10px', color: '#60a5fa' }}>{t.algorithm_parameters}</h4>
                                         {Object.entries(params[algorithm]).map(([key, value]) => (
                                             <div key={key} className="param-item">
                                                 <div className="param-label">
-                                                    <span>{key}</span>
+                                                    <span>{t[key] || key}</span>
                                                     <span className="param-value">{value}</span>
                                                 </div>
                                                 <input
@@ -1030,7 +1220,7 @@
                         {activeTab === 'overview' && (
                             <div className="grid grid-2">
                                 <div>
-                                    <h3 style={{ marginBottom: '20px' }}>Training Progress</h3>
+                                    <h3 style={{ marginBottom: '20px' }}>{t.training_progress}</h3>
                                     <SimpleLineChart 
                                         data={trainingData}
                                         lines={[
@@ -1041,17 +1231,17 @@
                                     />
                                 </div>
                                 <div>
-                                    <h3 style={{ marginBottom: '20px' }}>Current Status</h3>
+                                    <h3 style={{ marginBottom: '20px' }}>{t.current_status}</h3>
                                     <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
-                                        <p><strong>Algorithm:</strong> {algorithm}</p>
-                                        <p><strong>Environment:</strong> {t[environment]}</p>
-                                        <p><strong>Episode:</strong> {episode}</p>
-                                        <p><strong>Status:</strong> <span style={{ color: isTraining ? '#10b981' : '#ef4444' }}>
+                                        <p><strong>{t.algorithm_selection}:</strong> {algorithm}</p>
+                                        <p><strong>{t.environment_selection}:</strong> {t[environment]}</p>
+                                        <p><strong>{t.episode}:</strong> {episode}</p>
+                                        <p><strong>{t.status}:</strong> <span style={{ color: isTraining ? '#10b981' : '#ef4444' }}>
                                             {isTraining ? t.training_status : t.stopped_status}
                                         </span></p>
                                         <div style={{ marginTop: '20px' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                                                <span>Progress:</span>
+                                                <span>{t.progress}:</span>
                                                 <span>{Math.min(100, (episode / 500) * 100).toFixed(1)}%</span>
                                             </div>
                                             <div style={{ 
@@ -1076,7 +1266,7 @@
                         {activeTab === 'training' && (
                             <div className="grid grid-2">
                                 <div>
-                                    <h3 style={{ marginBottom: '20px' }}>Performance Metrics</h3>
+                                    <h3 style={{ marginBottom: '20px' }}>{t.performance_metrics}</h3>
                                     <SimpleLineChart 
                                         data={trainingData}
                                         lines={[
@@ -1086,7 +1276,7 @@
                                     />
                                 </div>
                                 <div>
-                                    <h3 style={{ marginBottom: '20px' }}>Exploration & Convergence</h3>
+                                    <h3 style={{ marginBottom: '20px' }}>{t.exploration_convergence}</h3>
                                     <SimpleLineChart 
                                         data={trainingData}
                                         lines={[
@@ -1101,7 +1291,7 @@
                         {activeTab === 'environment' && (
                             <div className="grid grid-2">
                                 <div>
-                                    <h3 style={{ marginBottom: '20px' }}>Environment Visualization ({gridSize}×{gridSize})</h3>
+                                    <h3 style={{ marginBottom: '20px' }}>{t.environment_visualization} ({gridSize}×{gridSize})</h3>
                                     <div 
                                         className="environment-grid"
                                         style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}
@@ -1135,32 +1325,32 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 style={{ marginBottom: '20px' }}>Environment Information</h3>
+                                    <h3 style={{ marginBottom: '20px' }}>{t.environment_information}</h3>
                                     <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
                                         <h4 style={{ marginBottom: '15px', color: '#60a5fa' }}>{t[environment]}</h4>
                                         <div style={{ marginBottom: '15px' }}>
-                                            <strong>Grid Size:</strong> {gridSize}×{gridSize}
+                                            <strong>{t.grid_size}:</strong> {gridSize}×{gridSize}
                                         </div>
                                         {environment === 'predator_prey' && (
                                             <div>
-                                                <p>Predators: {envParams.predator_prey.num_predators}</p>
-                                                <p>Prey: {envParams.predator_prey.num_prey}</p>
+                                                <p>{t.predator}: {envParams.predator_prey.num_predators}</p>
+                                                <p>{t.prey}: {envParams.predator_prey.num_prey}</p>
                                             </div>
                                         )}
                                         {environment === 'traffic' && (
                                             <div>
-                                                <p>Vehicles: {envParams.traffic.num_vehicles}</p>
+                                                <p>{t.vehicle}: {envParams.traffic.num_vehicles}</p>
                                             </div>
                                         )}
                                         {environment === 'resource' && (
                                             <div>
-                                                <p>Agents: {envParams.resource.num_agents}</p>
-                                                <p>Resources: {envParams.resource.num_resources}</p>
+                                                <p>{t.agent}: {envParams.resource.num_agents}</p>
+                                                <p>{t.resource}: {envParams.resource.num_resources}</p>
                                             </div>
                                         )}
                                         
                                         <div style={{ marginTop: '20px' }}>
-                                            <h5 style={{ marginBottom: '10px' }}>Legend:</h5>
+                                            <h5 style={{ marginBottom: '10px' }}>{t.legend}:</h5>
                                             {agentPositions.length > 0 && (
                                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                                                     {[...new Set(agentPositions.map(a => a.type))].map(type => {
@@ -1174,7 +1364,7 @@
                                                                     backgroundColor: agent.color
                                                                 }}></div>
                                                                 <span style={{ fontSize: '0.9rem' }}>
-                                                                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                                                                    {t[type]}
                                                                 </span>
                                                             </div>
                                                         );
@@ -1202,7 +1392,7 @@
                                 
                                 <div className="grid grid-2">
                                     <div>
-                                        <h4 style={{ color: '#10b981', marginBottom: '15px' }}>Advantages</h4>
+                                        <h4 style={{ color: '#10b981', marginBottom: '15px' }}>{t.advantages}</h4>
                                         <ul className="feature-list">
                                             {algorithmInfo[algorithm].advantages.map((advantage, index) => (
                                                 <li key={index}>
@@ -1214,7 +1404,7 @@
                                     </div>
                                     
                                     <div>
-                                        <h4 style={{ color: '#ef4444', marginBottom: '15px' }}>Limitations</h4>
+                                        <h4 style={{ color: '#ef4444', marginBottom: '15px' }}>{t.limitations}</h4>
                                         <ul className="feature-list">
                                             {algorithmInfo[algorithm].limitations.map((limitation, index) => (
                                                 <li key={index}>
@@ -1227,7 +1417,7 @@
                                 </div>
                                 
                                 <div style={{ marginTop: '30px' }}>
-                                    <h4 style={{ color: '#60a5fa', marginBottom: '15px' }}>Current Parameters</h4>
+                                    <h4 style={{ color: '#60a5fa', marginBottom: '15px' }}>{t.current_parameters}</h4>
                                     <div className="grid grid-2">
                                         {Object.entries(params[algorithm]).map(([key, value]) => (
                                             <div key={key} style={{ 
@@ -1237,7 +1427,7 @@
                                                 display: 'flex',
                                                 justifyContent: 'space-between'
                                             }}>
-                                                <span>{key}</span>
+                                                <span>{t[key] || key}</span>
                                                 <span style={{ fontFamily: 'monospace', color: '#60a5fa' }}>{value}</span>
                                             </div>
                                         ))}
@@ -1248,35 +1438,23 @@
 
                         {activeTab === 'analysis' && (
                             <div>
-                                <h3 style={{ marginBottom: '20px' }}>Performance Analysis</h3>
+                                <h3 style={{ marginBottom: '20px' }}>{t.performance_analysis}</h3>
                                 <div className="grid grid-2">
                                     <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
-                                        <h4 style={{ color: '#60a5fa', marginBottom: '15px' }}>Parameter Impact</h4>
+                                        <h4 style={{ color: '#60a5fa', marginBottom: '15px' }}>{t.parameter_impact}</h4>
                                         <div style={{ marginBottom: '15px' }}>
-                                            <strong>Learning Rate Impact:</strong>
-                                            <p style={{ fontSize: '0.9rem', color: '#94a3b8', marginTop: '5px' }}>
-                                                Higher values lead to faster but less stable convergence.
-                                                Lower values ensure stability but slower learning.
-                                            </p>
+                                            <strong>{t.lr_impact}</strong>
                                         </div>
                                         <div style={{ marginBottom: '15px' }}>
-                                            <strong>Gamma (Discount Factor):</strong>
-                                            <p style={{ fontSize: '0.9rem', color: '#94a3b8', marginTop: '5px' }}>
-                                                Values close to 1 prioritize long-term rewards.
-                                                Lower values focus on immediate rewards.
-                                            </p>
+                                            <strong>{t.gamma_impact}</strong>
                                         </div>
                                         <div>
-                                            <strong>Exploration vs Exploitation:</strong>
-                                            <p style={{ fontSize: '0.9rem', color: '#94a3b8', marginTop: '5px' }}>
-                                                Balance between trying new actions (exploration) and 
-                                                using known good actions (exploitation).
-                                            </p>
+                                            <strong>{t.exploration_impact}</strong>
                                         </div>
                                     </div>
                                     
                                     <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
-                                        <h4 style={{ color: '#10b981', marginBottom: '15px' }}>Algorithm Comparison</h4>
+                                        <h4 style={{ color: '#10b981', marginBottom: '15px' }}>{t.algorithm_comparison}</h4>
                                         {Object.keys(params).map(alg => (
                                             <div key={alg} style={{
                                                 padding: '10px',
@@ -1293,7 +1471,7 @@
                                                         backgroundColor: algorithmInfo[alg].color
                                                     }}></div>
                                                     <strong>{alg}</strong>
-                                                    {algorithm === alg && <span style={{ fontSize: '0.7rem', background: '#3b82f6', padding: '2px 6px', borderRadius: '10px' }}>Active</span>}
+                                                    {algorithm === alg && <span style={{ fontSize: '0.7rem', background: '#3b82f6', padding: '2px 6px', borderRadius: '10px' }}>{t.active}</span>}
                                                 </div>
                                                 <p style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
                                                     {algorithmInfo[alg].type}
