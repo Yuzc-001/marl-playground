@@ -4,35 +4,417 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Agent Reinforcement Learning Playground</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    }
-                }
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #60a5fa, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .header-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: #10b981;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .status-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .status-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .radio-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .radio-item input {
+            margin: 0;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 20px;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-height: 400px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            height: 300px;
+            position: relative;
+        }
+
+        .environment-grid {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            aspect-ratio: 1;
+            position: relative;
+            display: grid;
+            gap: 1px;
+        }
+
+        .grid-cell {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .agent {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+        }
+
+        .agent:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+
+        .param-controls {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .param-group {
+            margin-bottom: 20px;
+        }
+
+        .param-item {
+            margin-bottom: 15px;
+        }
+
+        .param-label {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .param-value {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .algorithm-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .algorithm-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .algorithm-badge {
+            background: rgba(59, 130, 246, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-family: monospace;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        .dot.red {
+            background: #ef4444;
+        }
+
+        .simple-chart {
+            width: 100%;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-line {
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
             }
         }
-    </script>
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
-        .slider::-webkit-slider-thumb {
-            appearance: none; height: 16px; width: 16px; border-radius: 50%;
-            background: linear-gradient(45deg, #3B82F6, #8B5CF6); cursor: pointer;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-        }
-        .line-clamp-2 {
-            display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden;
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                min-width: auto;
+            }
         }
     </style>
 </head>
@@ -40,135 +422,104 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, useCallback } = React;
-        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } = Recharts;
+        const { useState, useEffect, useRef } = React;
 
-        // Lucide React icons as SVG components
-        const Play = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <polygon points="5,3 19,12 5,21"></polygon>
-            </svg>
-        );
+        // 简单图标组件
+        const Icon = ({ type, size = 20 }) => {
+            const icons = {
+                play: "▶",
+                pause: "⏸",
+                reset: "🔄",
+                settings: "⚙",
+                globe: "🌐",
+                brain: "🧠",
+                users: "👥",
+                chart: "📊",
+                activity: "📈",
+                target: "🎯",
+                zap: "⚡",
+                book: "📚",
+                github: "📂",
+                download: "💾",
+                share: "📤"
+            };
+            
+            return <span style={{ fontSize: size }}>{icons[type] || "●"}</span>;
+        };
 
-        const Pause = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <rect x="6" y="4" width="4" height="16"></rect>
-                <rect x="14" y="4" width="4" height="16"></rect>
-            </svg>
-        );
-
-        const RotateCcw = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <polyline points="1,4 1,10 7,10"></polyline>
-                <path d="M3.51,15a9,9,0,0,0,14.85-3.36"></path>
-                <path d="M3,4.64A9,9,0,0,1,16.13,3.36L7,10"></path>
-            </svg>
-        );
-
-        const Settings = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4,15a1.65,1.65,0,0,0,.33,1.82l.06.06a2,2,0,0,1,0,2.83,2,2,0,0,1-2.83,0l-.06-.06a1.65,1.65,0,0,0-1.82-.33,1.65,1.65,0,0,0-1,1.51V21a2,2,0,0,1-2,2,2,2,0,0,1-2-2V20.51a1.65,1.65,0,0,0-1-1.51,1.65,1.65,0,0,0-1.82.33l-.06.06a2,2,0,0,1-2.83,0,2,2,0,0,1,0-2.83l.06-.06a1.65,1.65,0,0,0,.33-1.82,1.65,1.65,0,0,0-1.51-1H3a2,2,0,0,1-2-2,2,2,0,0,1,2-2H3.49a1.65,1.65,0,0,0,1.51-1,1.65,1.65,0,0,0-.33-1.82l-.06-.06a2,2,0,0,1,0-2.83,2,2,0,0,1,2.83,0l.06.06a1.65,1.65,0,0,0,1.82.33H9a1.65,1.65,0,0,0,1-1.51V3a2,2,0,0,1,2-2,2,2,0,0,1,2,2V3.49a1.65,1.65,0,0,0,1,1.51,1.65,1.65,0,0,0,1.82-.33l.06-.06a2,2,0,0,1,2.83,0,2,2,0,0,1,0,2.83l-.06.06a1.65,1.65,0,0,0-.33,1.82V9a1.65,1.65,0,0,0,1.51,1H21a2,2,0,0,1,2,2,2,2,0,0,1-2,2H20.51A1.65,1.65,0,0,0,19.4,15Z"></path>
-            </svg>
-        );
-
-        const Globe = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-                <path d="M12,2a15.3,15.3,0,0,1,4,10,15.3,15.3,0,0,1-4,10,15.3,15.3,0,0,1-4-10A15.3,15.3,0,0,1,12,2Z"></path>
-            </svg>
-        );
-
-        const Brain = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <path d="M9.5,2A2.5,2.5,0,0,1,12,4.5v15a2.5,2.5,0,0,1-5,0V16.25a2.25,2.25,0,0,0-4.5,0v3.25a2.5,2.5,0,0,1-5,0V15.5A6.5,6.5,0,0,1,4,9a2.5,2.5,0,0,1,0-5,2.5,2.5,0,0,1,5.5-2Z"></path>
-                <path d="M14.5,2A2.5,2.5,0,0,0,12,4.5v15a2.5,2.5,0,0,0,5,0V16.25a2.25,2.25,0,0,1,4.5,0v3.25a2.5,2.5,0,0,0,5,0V15.5A6.5,6.5,0,0,0,20,9a2.5,2.5,0,0,0,0-5,2.5,2.5,0,0,0-5.5-2Z"></path>
-            </svg>
-        );
-
-        const TrendingUp = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline>
-                <polyline points="16,7 22,7 22,13"></polyline>
-            </svg>
-        );
-
-        const Users = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <path d="M16,21v-2a4,4,0,0,0-4-4H6a4,4,0,0,0-4,4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M22,21v-2a4,4,0,0,0-3-3.87"></path>
-                <path d="M16,3.13a4,4,0,0,1,0,7.75"></path>
-            </svg>
-        );
-
-        const BookOpen = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <path d="M2,3H8a4,4,0,0,1,4,4V19a3,3,0,0,0-3-3H2Z"></path>
-                <path d="M22,3H16a4,4,0,0,0-4,4V19a3,3,0,0,1,3-3h7Z"></path>
-            </svg>
-        );
-
-        const Activity = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
-            </svg>
-        );
-
-        const Target = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="6"></circle>
-                <circle cx="12" cy="12" r="2"></circle>
-            </svg>
-        );
-
-        const BarChart3 = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <path d="M3,3V21H21"></path>
-                <rect x="7" y="12" width="4" height="9"></rect>
-                <rect x="15" y="8" width="4" height="13"></rect>
-            </svg>
-        );
-
-        const Zap = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"></polygon>
-            </svg>
-        );
-
-        const Github = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <path d="M9,19c-5,1.5-5-2.5-7-3m14,6v-3.87a3.37,3.37,0,0,0-.94-2.61c3.14-.35,6.44-1.54,6.44-7A5.44,5.44,0,0,0,20,4.77,5.07,5.07,0,0,0,19.91,1S18.73.65,16,2.48a13.38,13.38,0,0,0-7,0C6.27.65,5.09,1,5.09,1A5.07,5.07,0,0,0,5,4.77,5.44,5.44,0,0,0,3.5,8.55c0,5.42,3.3,6.61,6.44,7A3.37,3.37,0,0,0,9,18.13V22"></path>
-            </svg>
-        );
-
-        const Download = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <path d="M21,15v4a2,2,0,0,1-2,2H5a2,2,0,0,1-2-2V15"></path>
-                <polyline points="7,10 12,15 17,10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-        );
-
-        const Share2 = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <circle cx="18" cy="5" r="3"></circle>
-                <circle cx="6" cy="12" r="3"></circle>
-                <circle cx="18" cy="19" r="3"></circle>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-            </svg>
-        );
-
-        const Info = ({ size = 24, ...props }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-        );
+        // 简单线图组件
+        const SimpleLineChart = ({ data, lines }) => {
+            if (!data || data.length === 0) return <div className="simple-chart">No data</div>;
+            
+            const maxY = Math.max(...data.flatMap(d => lines.map(line => d[line.key] || 0)));
+            const minY = Math.min(...data.flatMap(d => lines.map(line => d[line.key] || 0)));
+            const range = maxY - minY || 1;
+            
+            const width = 300;
+            const height = 150;
+            const padding = 20;
+            
+            const xStep = (width - 2 * padding) / Math.max(data.length - 1, 1);
+            
+            return (
+                <div className="simple-chart">
+                    <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height + 40}`}>
+                        {lines.map((line, lineIndex) => {
+                            const points = data.map((d, i) => {
+                                const x = padding + i * xStep;
+                                const y = height - padding - ((d[line.key] - minY) / range) * (height - 2 * padding);
+                                return `${x},${y}`;
+                            }).join(' ');
+                            
+                            return (
+                                <polyline
+                                    key={lineIndex}
+                                    points={points}
+                                    className="chart-line"
+                                    stroke={line.color}
+                                />
+                            );
+                        })}
+                        
+                        {/* 简单网格线 */}
+                        {[0, 25, 50, 75, 100].map(percent => {
+                            const y = height - padding - (percent / 100) * (height - 2 * padding);
+                            return (
+                                <line
+                                    key={percent}
+                                    x1={padding}
+                                    y1={y}
+                                    x2={width - padding}
+                                    y2={y}
+                                    stroke="rgba(255,255,255,0.1)"
+                                    strokeWidth="1"
+                                />
+                            );
+                        })}
+                        
+                        {/* 图例 */}
+                        {lines.map((line, i) => (
+                            <g key={i}>
+                                <circle
+                                    cx={20 + i * 80}
+                                    cy={height + 25}
+                                    r="4"
+                                    fill={line.color}
+                                />
+                                <text
+                                    x={30 + i * 80}
+                                    y={height + 30}
+                                    fill="white"
+                                    fontSize="10"
+                                >
+                                    {line.name}
+                                </text>
+                            </g>
+                        ))}
+                    </svg>
+                </div>
+            );
+        };
 
         const MultiAgentRLPlayground = () => {
             const [language, setLanguage] = useState('zh');
@@ -178,7 +529,6 @@
             const [episode, setEpisode] = useState(0);
             const [activeTab, setActiveTab] = useState('overview');
             const [showSettings, setShowSettings] = useState(false);
-            const [animationSpeed, setAnimationSpeed] = useState(200);
 
             const translations = {
                 zh: {
@@ -186,66 +536,50 @@
                     subtitle: "Multi-Agent Reinforcement Learning Playground",
                     description: "探索、学习、实验 - 交互式MARL教学与研究平台",
                     overview: "概览",
-                    training: "训练监控", 
+                    training: "训练监控",
                     environment: "环境可视化",
                     algorithm: "算法详情",
                     analysis: "性能分析",
                     start: "开始训练",
                     pause: "暂停训练",
                     reset: "重置环境",
-                    settings: "参数设置",
                     export: "导出数据",
                     share: "分享配置",
-                    algorithms: "算法选择",
-                    environments: "环境选择",
-                    parameters: "参数调节",
-                    realtime: "实时指标",
                     episode: "回合",
                     reward: "平均奖励",
                     success_rate: "成功率",
                     exploration: "探索率",
-                    value_loss: "价值损失",
-                    policy_loss: "策略损失",
-                    grad_norm: "梯度范数",
+                    convergence: "收敛度",
                     predator_prey: "捕食者-猎物",
                     traffic: "交通控制",
                     resource: "资源收集",
                     training_status: "训练中",
-                    stopped_status: "已停止",
-                    ready_status: "就绪"
+                    stopped_status: "已停止"
                 },
                 en: {
                     title: "Multi-Agent Reinforcement Learning Playground",
                     subtitle: "多智能体强化学习游乐场",
                     description: "Explore, Learn, Experiment - Interactive MARL Teaching & Research Platform",
                     overview: "Overview",
-                    training: "Training Monitor",
-                    environment: "Environment Viz",
-                    algorithm: "Algorithm Details", 
-                    analysis: "Performance Analysis",
+                    training: "Training",
+                    environment: "Environment",
+                    algorithm: "Algorithm",
+                    analysis: "Analysis",
                     start: "Start Training",
-                    pause: "Pause Training", 
+                    pause: "Pause Training",
                     reset: "Reset Environment",
-                    settings: "Parameter Settings",
                     export: "Export Data",
                     share: "Share Config",
-                    algorithms: "Algorithm Selection",
-                    environments: "Environment Selection",
-                    parameters: "Parameter Tuning",
-                    realtime: "Real-time Metrics",
                     episode: "Episode",
                     reward: "Mean Reward",
                     success_rate: "Success Rate",
                     exploration: "Exploration Rate",
-                    value_loss: "Value Loss",
-                    policy_loss: "Policy Loss", 
-                    grad_norm: "Gradient Norm",
+                    convergence: "Convergence",
                     predator_prey: "Predator-Prey",
                     traffic: "Traffic Control",
                     resource: "Resource Collection",
                     training_status: "Training",
-                    stopped_status: "Stopped", 
-                    ready_status: "Ready"
+                    stopped_status: "Stopped"
                 }
             };
 
@@ -256,77 +590,36 @@
                     lr_actor: 0.0003,
                     lr_critic: 0.001,
                     gamma: 0.99,
-                    gae_lambda: 0.95,
                     clip_ratio: 0.2,
-                    value_loss_coef: 0.5,
-                    entropy_coef: 0.01,
-                    max_grad_norm: 0.5,
-                    ppo_epochs: 10,
-                    mini_batch_size: 64
+                    entropy_coef: 0.01
                 },
                 QMIX: {
                     learning_rate: 0.0005,
                     gamma: 0.99,
                     epsilon: 0.5,
                     epsilon_decay: 0.995,
-                    epsilon_min: 0.05,
-                    target_update_freq: 200,
-                    mixing_embed_dim: 32,
-                    rnn_hidden_dim: 64,
-                    batch_size: 32,
-                    buffer_size: 5000
+                    target_update: 200
                 },
                 MADDPG: {
                     lr_actor: 0.01,
                     lr_critic: 0.01,
                     gamma: 0.95,
                     tau: 0.01,
-                    noise_std: 0.1,
-                    noise_clip: 0.5,
-                    policy_delay: 2,
-                    batch_size: 64,
-                    buffer_size: 100000,
-                    warmup_steps: 1000
+                    noise_std: 0.1
                 },
                 MASAC: {
                     lr_actor: 0.0003,
                     lr_critic: 0.0003,
-                    lr_alpha: 0.0003,
                     gamma: 0.99,
                     tau: 0.005,
-                    alpha: 0.2,
-                    target_entropy: -2.0,
-                    batch_size: 64,
-                    buffer_size: 100000,
-                    target_update_freq: 1
+                    alpha: 0.2
                 }
             });
 
             const [envParams, setEnvParams] = useState({
-                predator_prey: {
-                    num_predators: 3,
-                    num_prey: 2,
-                    grid_size: 10,
-                    max_episode_steps: 100,
-                    catch_reward: 10.0,
-                    step_penalty: -0.1
-                },
-                traffic: {
-                    num_vehicles: 4,
-                    grid_size: 8,
-                    max_episode_steps: 200,
-                    success_reward: 5.0,
-                    collision_penalty: -10.0,
-                    wait_penalty: -0.1
-                },
-                resource: {
-                    num_agents: 5,
-                    num_resources: 3,
-                    grid_size: 12,
-                    max_episode_steps: 150,
-                    collect_reward: 5.0,
-                    movement_cost: -0.05
-                }
+                predator_prey: { num_predators: 3, num_prey: 2, grid_size: 10 },
+                traffic: { num_vehicles: 4, grid_size: 8 },
+                resource: { num_agents: 5, num_resources: 3, grid_size: 12 }
             });
 
             const [trainingData, setTrainingData] = useState([]);
@@ -334,15 +627,10 @@
             const [currentStats, setCurrentStats] = useState({
                 mean_reward: 0,
                 success_rate: 0,
-                exploration_rate: 0,
-                value_loss: 0,
-                policy_loss: 0,
-                grad_norm: 0,
-                convergence: 0,
-                stability: 0
+                exploration_rate: 50,
+                convergence: 0
             });
 
-            const [performanceProfile, setPerformanceProfile] = useState([]);
             const intervalRef = useRef(null);
             const gridSize = envParams[environment].grid_size;
 
@@ -350,102 +638,46 @@
                 MAPPO: {
                     name: language === 'zh' ? "多智能体近端策略优化" : "Multi-Agent Proximal Policy Optimization",
                     type: language === 'zh' ? "在线策略梯度" : "On-policy Policy Gradient",
-                    paper: "The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games (2022)",
-                    keyIdea: language === 'zh' 
-                        ? "使用信任域约束的多智能体策略梯度方法，通过裁剪确保稳定更新"
-                        : "Multi-agent policy gradient with trust region constraints, using clipping for stable updates",
                     advantages: language === 'zh' 
                         ? ["训练稳定", "样本效率较高", "理论基础扎实"]
                         : ["Stable training", "Good sample efficiency", "Strong theoretical foundation"],
                     limitations: language === 'zh'
                         ? ["需要大量在线样本", "对超参数敏感", "仅适用于合作场景"]
                         : ["Requires many online samples", "Sensitive to hyperparameters", "Only for cooperative scenarios"],
-                    bestFor: language === 'zh' ? "完全合作的多智能体任务" : "Fully cooperative multi-agent tasks",
-                    color: "#3B82F6"
+                    color: "#3b82f6"
                 },
                 QMIX: {
                     name: language === 'zh' ? "单调值函数分解" : "Monotonic Value Function Factorisation",
                     type: language === 'zh' ? "离线值函数" : "Off-policy Value-based",
-                    paper: "QMIX: Monotonic Value Function Factorisation for Deep Multi-Agent RL (ICML 2018)",
-                    keyIdea: language === 'zh'
-                        ? "通过单调性约束将个体Q值组合为全局Q值，保证IGM原理"
-                        : "Combines individual Q-values into global Q-value with monotonicity constraints, ensuring IGM",
                     advantages: language === 'zh'
                         ? ["理论保证IGM", "样本效率高", "处理部分可观察性"]
                         : ["Theoretical IGM guarantee", "High sample efficiency", "Handles partial observability"],
                     limitations: language === 'zh'
                         ? ["仅限单调性假设", "限制策略多样性", "仅适用于合作"]
                         : ["Limited to monotonicity assumption", "Restricts policy diversity", "Only for cooperation"],
-                    bestFor: language === 'zh' ? "合作型部分可观察环境" : "Cooperative partially observable environments",
-                    color: "#10B981"
+                    color: "#10b981"
                 },
                 MADDPG: {
                     name: language === 'zh' ? "多智能体深度确定性策略梯度" : "Multi-Agent Deep Deterministic Policy Gradient",
                     type: language === 'zh' ? "离线演员-评论家" : "Off-policy Actor-Critic",
-                    paper: "Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments (NIPS 2017)",
-                    keyIdea: language === 'zh'
-                        ? "集中训练分散执行，critic观察全局信息，actor仅用局部信息执行"
-                        : "Centralized training with decentralized execution, critic uses global info, actor uses local info",
                     advantages: language === 'zh'
                         ? ["处理连续动作", "适用混合环境", "非平稳性处理"]
                         : ["Handles continuous actions", "Works in mixed environments", "Addresses non-stationarity"],
                     limitations: language === 'zh'
                         ? ["训练不稳定", "高方差", "需要仔细调参"]
                         : ["Training instability", "High variance", "Requires careful tuning"],
-                    bestFor: language === 'zh' ? "连续控制和混合竞争合作环境" : "Continuous control and mixed competitive-cooperative environments",
-                    color: "#F59E0B"
+                    color: "#f59e0b"
                 },
                 MASAC: {
                     name: language === 'zh' ? "多智能体软演员-评论家" : "Multi-Agent Soft Actor-Critic",
                     type: language === 'zh' ? "离线演员-评论家" : "Off-policy Actor-Critic",
-                    paper: "Soft Actor-Critic Algorithms and Applications (2018) + Multi-Agent Extension",
-                    keyIdea: language === 'zh'
-                        ? "基于最大熵强化学习的多智能体扩展，平衡探索与利用"
-                        : "Multi-agent extension of maximum entropy RL, balancing exploration and exploitation",
                     advantages: language === 'zh'
                         ? ["自适应探索", "训练稳定", "样本效率高"]
                         : ["Adaptive exploration", "Stable training", "High sample efficiency"],
                     limitations: language === 'zh'
                         ? ["实现复杂", "内存需求大", "调参困难"]
                         : ["Complex implementation", "High memory requirements", "Difficult tuning"],
-                    bestFor: language === 'zh' ? "需要鲁棒探索的连续控制任务" : "Continuous control tasks requiring robust exploration",
-                    color: "#8B5CF6"
-                }
-            };
-
-            const environmentInfo = {
-                predator_prey: {
-                    name: language === 'zh' ? "捕食者-猎物环境" : "Predator-Prey Environment",
-                    description: language === 'zh' 
-                        ? "经典的多智能体合作/竞争场景，捕食者需要协调捕获猎物"
-                        : "Classic multi-agent cooperative/competitive scenario where predators coordinate to catch prey",
-                    agents: language === 'zh' ? ["捕食者", "猎物"] : ["Predators", "Prey"],
-                    objectives: language === 'zh' 
-                        ? ["捕食者：捕获猎物", "猎物：避免被捕获"]
-                        : ["Predators: Catch prey", "Prey: Avoid being caught"],
-                    color: "#EF4444"
-                },
-                traffic: {
-                    name: language === 'zh' ? "交通控制环境" : "Traffic Control Environment", 
-                    description: language === 'zh'
-                        ? "多车辆交通路口协调，车辆需要避免碰撞并高效通行"
-                        : "Multi-vehicle traffic intersection coordination, vehicles must avoid collisions and pass efficiently",
-                    agents: language === 'zh' ? ["车辆"] : ["Vehicles"],
-                    objectives: language === 'zh'
-                        ? ["避免碰撞", "高效通行", "减少等待时间"]
-                        : ["Avoid collisions", "Efficient passage", "Reduce waiting time"],
-                    color: "#10B981"
-                },
-                resource: {
-                    name: language === 'zh' ? "资源收集环境" : "Resource Collection Environment",
-                    description: language === 'zh'
-                        ? "多智能体资源竞争与合作，智能体需要收集资源并可能进行合作"
-                        : "Multi-agent resource competition and cooperation, agents collect resources and may cooperate",
-                    agents: language === 'zh' ? ["收集者", "资源"] : ["Collectors", "Resources"],
-                    objectives: language === 'zh'
-                        ? ["收集资源", "合作共享", "效率最大化"]
-                        : ["Collect resources", "Cooperative sharing", "Maximize efficiency"],
-                    color: "#8B5CF6"
+                    color: "#8b5cf6"
                 }
             };
 
@@ -453,66 +685,59 @@
                 resetEnvironment();
             }, [environment]);
 
-            const resetEnvironment = useCallback(() => {
+            const resetEnvironment = () => {
                 setEpisode(0);
                 setTrainingData([]);
                 
                 const positions = [];
+                const env = envParams[environment];
+                
                 if (environment === 'predator_prey') {
-                    for (let i = 0; i < envParams.predator_prey.num_predators; i++) {
+                    for (let i = 0; i < env.num_predators; i++) {
                         positions.push({
                             id: `predator_${i}`,
                             type: 'predator',
-                            x: Math.floor(Math.random() * gridSize),
-                            y: Math.floor(Math.random() * gridSize),
-                            color: '#ef4444',
-                            energy: 100,
-                            success: 0
+                            x: Math.floor(Math.random() * env.grid_size),
+                            y: Math.floor(Math.random() * env.grid_size),
+                            color: '#ef4444'
                         });
                     }
-                    for (let i = 0; i < envParams.predator_prey.num_prey; i++) {
+                    for (let i = 0; i < env.num_prey; i++) {
                         positions.push({
                             id: `prey_${i}`,
                             type: 'prey',
-                            x: Math.floor(Math.random() * gridSize),
-                            y: Math.floor(Math.random() * gridSize),
-                            color: '#3b82f6',
-                            energy: 100,
-                            survival_time: 0
+                            x: Math.floor(Math.random() * env.grid_size),
+                            y: Math.floor(Math.random() * env.grid_size),
+                            color: '#3b82f6'
                         });
                     }
                 } else if (environment === 'traffic') {
-                    for (let i = 0; i < envParams.traffic.num_vehicles; i++) {
+                    for (let i = 0; i < env.num_vehicles; i++) {
                         positions.push({
                             id: `vehicle_${i}`,
                             type: 'vehicle',
-                            x: Math.floor(Math.random() * gridSize),
-                            y: Math.floor(Math.random() * gridSize),
-                            color: '#10b981',
-                            speed: Math.random() * 3 + 1,
-                            passed: false
+                            x: Math.floor(Math.random() * env.grid_size),
+                            y: Math.floor(Math.random() * env.grid_size),
+                            color: '#10b981'
                         });
                     }
                 } else if (environment === 'resource') {
-                    for (let i = 0; i < envParams.resource.num_agents; i++) {
+                    for (let i = 0; i < env.num_agents; i++) {
                         positions.push({
                             id: `agent_${i}`,
                             type: 'agent',
-                            x: Math.floor(Math.random() * gridSize),
-                            y: Math.floor(Math.random() * gridSize),
-                            color: '#8b5cf6',
-                            carrying: 0,
-                            collected: 0
+                            x: Math.floor(Math.random() * env.grid_size),
+                            y: Math.floor(Math.random() * env.grid_size),
+                            color: '#8b5cf6'
                         });
                     }
-                    for (let i = 0; i < envParams.resource.num_resources; i++) {
+                    for (let i = 0; i < env.num_resources; i++) {
                         positions.push({
                             id: `resource_${i}`,
                             type: 'resource',
-                            x: Math.floor(Math.random() * gridSize),
-                            y: Math.floor(Math.random() * gridSize),
-                            color: '#eab308',
-                            amount: Math.floor(Math.random() * 5) + 1
+                            x: Math.floor(Math.random() * env.grid_size),
+                            y: Math.floor(Math.random() * env.grid_size),
+                            color: '#eab308'
                         });
                     }
                 }
@@ -521,25 +746,9 @@
                 setCurrentStats({
                     mean_reward: 0,
                     success_rate: 0,
-                    exploration_rate: getInitialExplorationRate(),
-                    value_loss: 1.0,
-                    policy_loss: algorithm === 'QMIX' ? 0 : 1.0,
-                    grad_norm: 1.0,
-                    convergence: 0,
-                    stability: 100
+                    exploration_rate: 50,
+                    convergence: 0
                 });
-                
-                setPerformanceProfile([]);
-            }, [environment, envParams, gridSize, algorithm]);
-
-            const getInitialExplorationRate = () => {
-                switch (algorithm) {
-                    case 'MAPPO': return params.MAPPO.entropy_coef * 100;
-                    case 'QMIX': return params.QMIX.epsilon * 100;
-                    case 'MADDPG': return params.MADDPG.noise_std * 100;
-                    case 'MASAC': return params.MASAC.alpha * 50;
-                    default: return 50;
-                }
             };
 
             const startTraining = () => {
@@ -549,20 +758,38 @@
                 intervalRef.current = setInterval(() => {
                     setEpisode(prev => {
                         const newEpisode = prev + 1;
-                        const results = calculateTrainingResults(newEpisode);
+                        const progress = Math.min(newEpisode / 500, 1);
+                        
+                        const results = {
+                            episode: newEpisode,
+                            mean_reward: Math.max(0, 50 + progress * 40 + (Math.random() - 0.5) * 20),
+                            success_rate: Math.min(100, progress * 80 + (Math.random() - 0.5) * 20),
+                            exploration_rate: Math.max(5, 80 * (1 - progress) + (Math.random() - 0.5) * 10),
+                            convergence: Math.min(100, progress * 90 + (Math.random() - 0.5) * 10)
+                        };
                         
                         setTrainingData(prevData => {
-                            const newData = [...prevData, { episode: newEpisode, ...results }];
-                            return newData.slice(-200);
+                            const newData = [...prevData, results];
+                            return newData.slice(-100);
                         });
                         
                         setCurrentStats(results);
-                        updateAgentPositions();
-                        updatePerformanceProfile(results);
+                        
+                        // 更新智能体位置
+                        setAgentPositions(prev => prev.map(agent => {
+                            if (agent.type === 'resource') return agent;
+                            
+                            const newX = Math.max(0, Math.min(gridSize - 1, 
+                                agent.x + Math.floor((Math.random() - 0.5) * 3)));
+                            const newY = Math.max(0, Math.min(gridSize - 1, 
+                                agent.y + Math.floor((Math.random() - 0.5) * 3)));
+                            
+                            return { ...agent, x: newX, y: newY };
+                        }));
                         
                         return newEpisode;
                     });
-                }, animationSpeed);
+                }, 300);
             };
 
             const stopTraining = () => {
@@ -572,255 +799,18 @@
                 }
             };
 
-            const calculateTrainingResults = (episode) => {
-                const currentParams = params[algorithm];
-                const currentEnv = envParams[environment];
-                
-                const progress = Math.min(episode / 1000, 1);
-                
-                const lrEffect = calculateLearningRateEffect(currentParams, episode);
-                const gammaEffect = calculateGammaEffect(currentParams, progress);
-                const explorationEffect = calculateExplorationEffect(currentParams, episode);
-                const envComplexity = calculateEnvironmentComplexity(currentEnv);
-                
-                const baseReward = 50;
-                const meanReward = Math.max(0, 
-                    baseReward + lrEffect + gammaEffect + explorationEffect.rewardBonus + envComplexity +
-                    (Math.random() - 0.5) * 10
-                );
-                
-                const successRate = Math.min(100, Math.max(0, 
-                    (meanReward / 100) * 100 + (progress * 20) + (Math.random() - 0.5) * 15
-                ));
-                
-                const losses = calculateLosses(currentParams, episode);
-                const convergence = Math.min(100, progress * 100 + (Math.random() - 0.5) * 10);
-                const stability = Math.max(0, 100 - losses.valueLoss * 50 + (Math.random() - 0.5) * 10);
-                
-                return {
-                    mean_reward: meanReward,
-                    success_rate: successRate,
-                    exploration_rate: explorationEffect.currentRate,
-                    value_loss: losses.valueLoss,
-                    policy_loss: losses.policyLoss,
-                    grad_norm: losses.gradNorm,
-                    convergence: convergence,
-                    stability: stability
-                };
-            };
-
-            const calculateLearningRateEffect = (params, episode) => {
-                let mainLR;
-                switch (algorithm) {
-                    case 'MAPPO': mainLR = (params.lr_actor + params.lr_critic) / 2; break;
-                    case 'QMIX': mainLR = params.learning_rate; break;
-                    case 'MADDPG': mainLR = (params.lr_actor + params.lr_critic) / 2; break;
-                    case 'MASAC': mainLR = (params.lr_actor + params.lr_critic) / 2; break;
-                }
-                
-                const optimalLR = 0.001;
-                const lrRatio = mainLR / optimalLR;
-                
-                if (lrRatio > 1) {
-                    return episode < 200 ? lrRatio * 15 : lrRatio * 5 - Math.random() * 20;
-                } else {
-                    return lrRatio * 20 * Math.min(episode / 500, 1);
-                }
-            };
-
-            const calculateGammaEffect = (params, progress) => {
-                const gamma = params.gamma;
-                const shortTermBonus = (1 - gamma) * 30;
-                const longTermBonus = gamma * 40 * progress;
-                return shortTermBonus + longTermBonus;
-            };
-
-            const calculateExplorationEffect = (params, episode) => {
-                let currentRate, rewardBonus;
-                
-                switch (algorithm) {
-                    case 'MAPPO':
-                        currentRate = params.entropy_coef * 100 * Math.max(0.1, 1 - episode / 800);
-                        rewardBonus = params.entropy_coef > 0.05 ? 10 : -5;
-                        break;
-                    case 'QMIX':
-                        currentRate = Math.max(params.epsilon_min, params.epsilon * Math.pow(params.epsilon_decay, episode)) * 100;
-                        rewardBonus = currentRate > 10 ? 5 : (currentRate < 5 ? -10 : 0);
-                        break;
-                    case 'MADDPG':
-                        currentRate = params.noise_std * 100 * Math.max(0.1, 1 - episode / 600);
-                        rewardBonus = params.noise_std > 0.2 ? -5 : (params.noise_std < 0.05 ? -8 : 8);
-                        break;
-                    case 'MASAC':
-                        currentRate = params.alpha * 50;
-                        rewardBonus = params.alpha > 0.1 && params.alpha < 0.3 ? 12 : 0;
-                        break;
-                    default:
-                        currentRate = 50;
-                        rewardBonus = 0;
-                }
-                
-                return { currentRate, rewardBonus };
-            };
-
-            const calculateEnvironmentComplexity = (envParams) => {
-                let complexity = 0;
-                
-                if (environment === 'predator_prey') {
-                    const ratio = envParams.num_predators / envParams.num_prey;
-                    complexity = ratio > 1 ? 10 : -5;
-                    complexity += (envParams.grid_size - 10) * 2;
-                } else if (environment === 'traffic') {
-                    complexity = -(envParams.num_vehicles - 4) * 3;
-                } else if (environment === 'resource') {
-                    const ratio = envParams.num_resources / envParams.num_agents;
-                    complexity = ratio > 0.5 ? 8 : -8;
-                }
-                
-                return complexity;
-            };
-
-            const calculateLosses = (params, episode) => {
-                const baseDecay = Math.exp(-episode / 300);
-                
-                let valueLoss, policyLoss, gradNorm;
-                
-                switch (algorithm) {
-                    case 'MAPPO':
-                        valueLoss = Math.max(0.05, baseDecay * (2 - params.lr_critic * 1000) + Math.random() * 0.1);
-                        policyLoss = Math.max(0.02, baseDecay * (1.5 - params.lr_actor * 1000) + Math.random() * 0.05);
-                        gradNorm = Math.min(params.max_grad_norm, baseDecay * 2 + Math.random() * 0.5);
-                        break;
-                    case 'QMIX':
-                        valueLoss = Math.max(0.05, baseDecay * (1.8 - params.learning_rate * 2000) + Math.random() * 0.1);
-                        policyLoss = 0;
-                        gradNorm = baseDecay * 1.5 + Math.random() * 0.3;
-                        break;
-                    case 'MADDPG':
-                        valueLoss = Math.max(0.05, baseDecay * (2.2 - params.lr_critic * 100) + Math.random() * 0.15);
-                        policyLoss = Math.max(0.02, baseDecay * (1.2 - params.lr_actor * 100) + Math.random() * 0.08);
-                        gradNorm = baseDecay * 1.8 + Math.random() * 0.4;
-                        break;
-                    case 'MASAC':
-                        valueLoss = Math.max(0.05, baseDecay * (1.5 - params.lr_critic * 1000) + Math.random() * 0.08);
-                        policyLoss = Math.max(0.02, baseDecay * (1.0 - params.lr_actor * 1000) + Math.random() * 0.06);
-                        gradNorm = baseDecay * 1.3 + Math.random() * 0.25;
-                        break;
-                    default:
-                        valueLoss = baseDecay;
-                        policyLoss = baseDecay * 0.8;
-                        gradNorm = baseDecay * 1.5;
-                }
-                
-                return { valueLoss, policyLoss, gradNorm };
-            };
-
-            const updateAgentPositions = () => {
-                setAgentPositions(prev => prev.map(agent => {
-                    if (agent.type === 'resource') return agent;
-                    
-                    const newX = Math.max(0, Math.min(gridSize - 1, 
-                        agent.x + Math.floor((Math.random() - 0.5) * 3)));
-                    const newY = Math.max(0, Math.min(gridSize - 1, 
-                        agent.y + Math.floor((Math.random() - 0.5) * 3)));
-                    
-                    return { ...agent, x: newX, y: newY };
+            const updateParam = (paramName, value) => {
+                setParams(prev => ({
+                    ...prev,
+                    [algorithm]: {
+                        ...prev[algorithm],
+                        [paramName]: value
+                    }
                 }));
             };
 
-            const updatePerformanceProfile = (stats) => {
-                setPerformanceProfile(prev => {
-                    const newProfile = [
-                        { metric: language === 'zh' ? '奖励' : 'Reward', value: stats.mean_reward },
-                        { metric: language === 'zh' ? '成功率' : 'Success', value: stats.success_rate },
-                        { metric: language === 'zh' ? '探索' : 'Exploration', value: stats.exploration_rate },
-                        { metric: language === 'zh' ? '收敛' : 'Convergence', value: stats.convergence },
-                        { metric: language === 'zh' ? '稳定性' : 'Stability', value: stats.stability }
-                    ];
-                    return newProfile;
-                });
-            };
-
-            const updateParam = (category, paramName, value) => {
-                if (category === 'env') {
-                    setEnvParams(prev => ({
-                        ...prev,
-                        [environment]: {
-                            ...prev[environment],
-                            [paramName]: value
-                        }
-                    }));
-                } else {
-                    setParams(prev => ({
-                        ...prev,
-                        [algorithm]: {
-                            ...prev[algorithm],
-                            [paramName]: value
-                        }
-                    }));
-                }
-            };
-
-            const getParamRange = (key) => {
-                const ranges = {
-                    'lr_actor': { min: 0.0001, max: 0.01, step: 0.0001 },
-                    'lr_critic': { min: 0.0001, max: 0.01, step: 0.0001 },
-                    'lr_alpha': { min: 0.0001, max: 0.01, step: 0.0001 },
-                    'learning_rate': { min: 0.0001, max: 0.01, step: 0.0001 },
-                    'gamma': { min: 0.90, max: 0.999, step: 0.001 },
-                    'gae_lambda': { min: 0.90, max: 0.99, step: 0.01 },
-                    'clip_ratio': { min: 0.1, max: 0.5, step: 0.05 },
-                    'value_loss_coef': { min: 0.1, max: 2.0, step: 0.1 },
-                    'entropy_coef': { min: 0.001, max: 0.1, step: 0.001 },
-                    'max_grad_norm': { min: 0.1, max: 2.0, step: 0.1 },
-                    'ppo_epochs': { min: 1, max: 20, step: 1 },
-                    'mini_batch_size': { min: 16, max: 256, step: 16 },
-                    'epsilon': { min: 0.01, max: 1.0, step: 0.01 },
-                    'epsilon_decay': { min: 0.99, max: 0.9999, step: 0.0001 },
-                    'epsilon_min': { min: 0.01, max: 0.1, step: 0.01 },
-                    'target_update_freq': { min: 50, max: 500, step: 50 },
-                    'mixing_embed_dim': { min: 16, max: 128, step: 16 },
-                    'rnn_hidden_dim': { min: 32, max: 256, step: 32 },
-                    'tau': { min: 0.001, max: 0.1, step: 0.001 },
-                    'noise_std': { min: 0.01, max: 0.5, step: 0.01 },
-                    'noise_clip': { min: 0.1, max: 1.0, step: 0.1 },
-                    'policy_delay': { min: 1, max: 5, step: 1 },
-                    'alpha': { min: 0.01, max: 1.0, step: 0.01 },
-                    'target_entropy': { min: -10, max: 0, step: 0.5 },
-                    'batch_size': { min: 16, max: 256, step: 16 },
-                    'buffer_size': { min: 1000, max: 200000, step: 1000 },
-                    'warmup_steps': { min: 100, max: 2000, step: 100 },
-                    'target_update_freq': { min: 1, max: 100, step: 1 },
-                    'num_predators': { min: 1, max: 8, step: 1 },
-                    'num_prey': { min: 1, max: 8, step: 1 },
-                    'num_vehicles': { min: 2, max: 8, step: 1 },
-                    'num_agents': { min: 2, max: 10, step: 1 },
-                    'num_resources': { min: 1, max: 8, step: 1 },
-                    'grid_size': { min: 6, max: 20, step: 1 },
-                    'max_episode_steps': { min: 50, max: 300, step: 10 },
-                    'catch_reward': { min: 1, max: 20, step: 1 },
-                    'step_penalty': { min: -1, max: -0.01, step: 0.01 },
-                    'success_reward': { min: 1, max: 20, step: 1 },
-                    'collision_penalty': { min: -20, max: -1, step: 1 },
-                    'wait_penalty': { min: -1, max: -0.01, step: 0.01 },
-                    'collect_reward': { min: 1, max: 20, step: 1 },
-                    'movement_cost': { min: -0.5, max: -0.01, step: 0.01 }
-                };
-                
-                return ranges[key] || { min: 0, max: 1, step: 0.1 };
-            };
-
             const exportData = () => {
-                const data = {
-                    algorithm,
-                    environment,
-                    params: params[algorithm],
-                    envParams: envParams[environment],
-                    trainingData,
-                    currentStats,
-                    episode
-                };
-                
+                const data = { algorithm, environment, params: params[algorithm], trainingData, currentStats, episode };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -831,14 +821,13 @@
             };
 
             const shareConfig = () => {
-                const config = {
-                    algorithm,
-                    environment,
-                    params: params[algorithm],
-                    envParams: envParams[environment]
-                };
-                
-                navigator.clipboard.writeText(JSON.stringify(config, null, 2));
+                const config = { algorithm, environment, params: params[algorithm] };
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(JSON.stringify(config, null, 2));
+                    alert(language === 'zh' ? '配置已复制到剪贴板' : 'Configuration copied to clipboard');
+                } else {
+                    alert(language === 'zh' ? '浏览器不支持复制功能' : 'Clipboard not supported in this browser');
+                }
             };
 
             useEffect(() => {
@@ -849,549 +838,472 @@
                 };
             }, []);
 
-            const algorithms = [
-                { value: 'MAPPO', label: 'MAPPO', desc: t.algorithms },
-                { value: 'QMIX', label: 'QMIX', desc: language === 'zh' ? '单调值函数分解' : 'Monotonic Value Function Factorisation' },
-                { value: 'MADDPG', label: 'MADDPG', desc: language === 'zh' ? '多智能体深度确定性策略梯度' : 'Multi-Agent Deep Deterministic Policy Gradient' },
-                { value: 'MASAC', label: 'MASAC', desc: language === 'zh' ? '多智能体软演员-评论家' : 'Multi-Agent Soft Actor-Critic' }
-            ];
-
-            const environments = [
-                { value: 'predator_prey', label: t.predator_prey, desc: environmentInfo.predator_prey.description },
-                { value: 'traffic', label: t.traffic, desc: environmentInfo.traffic.description },
-                { value: 'resource', label: t.resource, desc: environmentInfo.resource.description }
-            ];
-
             return (
-                <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white">
-                    <div className="relative overflow-hidden">
-                        <div className="absolute inset-0 overflow-hidden">
-                            <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-                            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
+                <div className="container">
+                    {/* 头部 */}
+                    <header className="header">
+                        <h1 className="title">{t.title}</h1>
+                        <p className="subtitle">{t.subtitle}</p>
+                        <div className="header-controls">
+                            <button 
+                                className="btn"
+                                onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
+                            >
+                                <Icon type="globe" /> {language === 'zh' ? 'EN' : '中文'}
+                            </button>
+                            <a href="https://github.com/yourusername/marl-playground" target="_blank" rel="noopener noreferrer" className="btn">
+                                <Icon type="github" /> GitHub
+                            </a>
+                            <button className="btn" onClick={exportData}>
+                                <Icon type="download" /> {t.export}
+                            </button>
+                            <button className="btn" onClick={shareConfig}>
+                                <Icon type="share" /> {t.share}
+                            </button>
+                        </div>
+                        <p style={{ color: '#94a3b8', marginTop: '20px' }}>{t.description}</p>
+                    </header>
+
+                    {/* 状态栏 */}
+                    <div className="status-bar">
+                        <div className="status-card">
+                            <div className="status-label">{t.episode}</div>
+                            <div className="status-value" style={{ color: '#60a5fa' }}>{episode}</div>
+                        </div>
+                        <div className="status-card">
+                            <div className="status-label">{t.reward}</div>
+                            <div className="status-value" style={{ color: '#10b981' }}>{currentStats.mean_reward.toFixed(1)}</div>
+                        </div>
+                        <div className="status-card">
+                            <div className="status-label">{t.success_rate}</div>
+                            <div className="status-value" style={{ color: '#8b5cf6' }}>{currentStats.success_rate.toFixed(1)}%</div>
+                        </div>
+                        <div className="status-card">
+                            <div className="status-label">{t.exploration}</div>
+                            <div className="status-value" style={{ color: '#f59e0b' }}>{currentStats.exploration_rate.toFixed(1)}%</div>
+                        </div>
+                        <div className="status-card">
+                            <div className="status-label">Status</div>
+                            <div className="status-value" style={{ color: isTraining ? '#10b981' : '#ef4444' }}>
+                                {isTraining ? <span className="animate-pulse">{t.training_status}</span> : t.stopped_status}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 控制面板 */}
+                    <div className="control-panel">
+                        {/* 算法选择 */}
+                        <div className="panel">
+                            <div className="panel-title">
+                                <Icon type="brain" /> Algorithm Selection
+                            </div>
+                            <div className="radio-group">
+                                {Object.keys(params).map(alg => (
+                                    <label key={alg} className="radio-item">
+                                        <input
+                                            type="radio"
+                                            value={alg}
+                                            checked={algorithm === alg}
+                                            onChange={(e) => setAlgorithm(e.target.value)}
+                                        />
+                                        <div>
+                                            <strong>{alg}</strong>
+                                            <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                                {algorithmInfo[alg].type}
+                                            </div>
+                                        </div>
+                                    </label>
+                                ))}
+                            </div>
                         </div>
 
-                        <div className="relative max-w-7xl mx-auto p-6">
-                            <header className="text-center mb-8">
-                                <div className="flex items-center justify-between mb-6">
-                                    <div className="flex items-center space-x-4">
-                                        <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl">
-                                            <Brain className="w-8 h-8 text-white" />
-                                        </div>
+                        {/* 环境选择 */}
+                        <div className="panel">
+                            <div className="panel-title">
+                                <Icon type="users" /> Environment Selection
+                            </div>
+                            <div className="radio-group">
+                                {Object.keys(envParams).map(env => (
+                                    <label key={env} className="radio-item">
+                                        <input
+                                            type="radio"
+                                            value={env}
+                                            checked={environment === env}
+                                            onChange={(e) => setEnvironment(e.target.value)}
+                                        />
                                         <div>
-                                            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                                                {t.title}
-                                            </h1>
-                                            <p className="text-gray-400 text-lg">{t.subtitle}</p>
+                                            <strong>{t[env]}</strong>
+                                            <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                                Grid: {envParams[env].grid_size}×{envParams[env].grid_size}
+                                            </div>
                                         </div>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 训练控制 */}
+                        <div className="panel">
+                            <div className="panel-title">
+                                <Icon type="activity" /> Training Control
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                                <button
+                                    className={`btn ${isTraining ? 'btn-danger' : 'btn-success'}`}
+                                    onClick={isTraining ? stopTraining : startTraining}
+                                    style={{ flex: 1 }}
+                                >
+                                    <Icon type={isTraining ? "pause" : "play"} /> 
+                                    {isTraining ? t.pause : t.start}
+                                </button>
+                                <button className="btn" onClick={resetEnvironment}>
+                                    <Icon type="reset" /> {t.reset}
+                                </button>
+                            </div>
+                            <div>
+                                <strong>Current Algorithm:</strong> {algorithm}<br/>
+                                <strong>Environment:</strong> {t[environment]}<br/>
+                                <strong>Episode:</strong> {episode}
+                            </div>
+                        </div>
+
+                        {/* 参数设置 */}
+                        <div className="panel">
+                            <div className="panel-title">
+                                <Icon type="settings" /> Parameters
+                                <button 
+                                    className="btn" 
+                                    onClick={() => setShowSettings(!showSettings)}
+                                    style={{ marginLeft: 'auto', padding: '5px 10px' }}
+                                >
+                                    {showSettings ? 'Hide' : 'Show'}
+                                </button>
+                            </div>
+                            {showSettings && (
+                                <div className="param-controls">
+                                    <div className="param-group">
+                                        <h4 style={{ marginBottom: '10px', color: '#60a5fa' }}>Algorithm Parameters</h4>
+                                        {Object.entries(params[algorithm]).map(([key, value]) => (
+                                            <div key={key} className="param-item">
+                                                <div className="param-label">
+                                                    <span>{key}</span>
+                                                    <span className="param-value">{value}</span>
+                                                </div>
+                                                <input
+                                                    type="range"
+                                                    min={key.includes('lr') ? 0.0001 : key === 'gamma' ? 0.9 : 0.01}
+                                                    max={key.includes('lr') ? 0.01 : key === 'gamma' ? 0.999 : 1}
+                                                    step={key.includes('lr') ? 0.0001 : 0.01}
+                                                    value={value}
+                                                    onChange={(e) => updateParam(key, parseFloat(e.target.value))}
+                                                    className="slider"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* 标签页 */}
+                    <div className="tabs">
+                        {[
+                            { id: 'overview', label: t.overview, icon: 'chart' },
+                            { id: 'training', label: t.training, icon: 'activity' },
+                            { id: 'environment', label: t.environment, icon: 'users' },
+                            { id: 'algorithm', label: t.algorithm, icon: 'book' },
+                            { id: 'analysis', label: t.analysis, icon: 'target' }
+                        ].map(tab => (
+                            <button
+                                key={tab.id}
+                                className={`tab ${activeTab === tab.id ? 'active' : ''}`}
+                                onClick={() => setActiveTab(tab.id)}
+                            >
+                                <Icon type={tab.icon} /> {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* 主内容 */}
+                    <div className="main-content">
+                        {activeTab === 'overview' && (
+                            <div className="grid grid-2">
+                                <div>
+                                    <h3 style={{ marginBottom: '20px' }}>Training Progress</h3>
+                                    <SimpleLineChart 
+                                        data={trainingData}
+                                        lines={[
+                                            { key: 'mean_reward', color: '#60a5fa', name: t.reward },
+                                            { key: 'success_rate', color: '#10b981', name: t.success_rate },
+                                            { key: 'exploration_rate', color: '#f59e0b', name: t.exploration }
+                                        ]}
+                                    />
+                                </div>
+                                <div>
+                                    <h3 style={{ marginBottom: '20px' }}>Current Status</h3>
+                                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                                        <p><strong>Algorithm:</strong> {algorithm}</p>
+                                        <p><strong>Environment:</strong> {t[environment]}</p>
+                                        <p><strong>Episode:</strong> {episode}</p>
+                                        <p><strong>Status:</strong> <span style={{ color: isTraining ? '#10b981' : '#ef4444' }}>
+                                            {isTraining ? t.training_status : t.stopped_status}
+                                        </span></p>
+                                        <div style={{ marginTop: '20px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                                                <span>Progress:</span>
+                                                <span>{Math.min(100, (episode / 500) * 100).toFixed(1)}%</span>
+                                            </div>
+                                            <div style={{ 
+                                                background: 'rgba(255,255,255,0.1)', 
+                                                height: '8px', 
+                                                borderRadius: '4px',
+                                                overflow: 'hidden'
+                                            }}>
+                                                <div style={{
+                                                    background: 'linear-gradient(90deg, #60a5fa, #10b981)',
+                                                    height: '100%',
+                                                    width: `${Math.min(100, (episode / 500) * 100)}%`,
+                                                    transition: 'width 0.3s ease'
+                                                }}></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'training' && (
+                            <div className="grid grid-2">
+                                <div>
+                                    <h3 style={{ marginBottom: '20px' }}>Performance Metrics</h3>
+                                    <SimpleLineChart 
+                                        data={trainingData}
+                                        lines={[
+                                            { key: 'mean_reward', color: '#60a5fa', name: t.reward },
+                                            { key: 'success_rate', color: '#10b981', name: t.success_rate }
+                                        ]}
+                                    />
+                                </div>
+                                <div>
+                                    <h3 style={{ marginBottom: '20px' }}>Exploration & Convergence</h3>
+                                    <SimpleLineChart 
+                                        data={trainingData}
+                                        lines={[
+                                            { key: 'exploration_rate', color: '#f59e0b', name: t.exploration },
+                                            { key: 'convergence', color: '#8b5cf6', name: t.convergence }
+                                        ]}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'environment' && (
+                            <div className="grid grid-2">
+                                <div>
+                                    <h3 style={{ marginBottom: '20px' }}>Environment Visualization ({gridSize}×{gridSize})</h3>
+                                    <div 
+                                        className="environment-grid"
+                                        style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}
+                                    >
+                                        {Array.from({ length: gridSize * gridSize }).map((_, i) => (
+                                            <div key={i} className="grid-cell"></div>
+                                        ))}
+                                        
+                                        {agentPositions.map(agent => (
+                                            <div
+                                                key={agent.id}
+                                                className="agent"
+                                                style={{
+                                                    left: `${(agent.x / gridSize) * 100}%`,
+                                                    top: `${(agent.y / gridSize) * 100}%`,
+                                                    width: `${100 / gridSize * 0.8}%`,
+                                                    height: `${100 / gridSize * 0.8}%`,
+                                                    backgroundColor: agent.color,
+                                                    transform: 'translate(-50%, -50%)',
+                                                    marginLeft: `${100 / gridSize / 2}%`,
+                                                    marginTop: `${100 / gridSize / 2}%`
+                                                }}
+                                                title={`${agent.id} - (${agent.x}, ${agent.y})`}
+                                            >
+                                                {agent.type === 'predator' ? 'P' : 
+                                                 agent.type === 'prey' ? 'R' :
+                                                 agent.type === 'vehicle' ? 'V' :
+                                                 agent.type === 'resource' ? 'R' : 'A'}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 style={{ marginBottom: '20px' }}>Environment Information</h3>
+                                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                                        <h4 style={{ marginBottom: '15px', color: '#60a5fa' }}>{t[environment]}</h4>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Grid Size:</strong> {gridSize}×{gridSize}
+                                        </div>
+                                        {environment === 'predator_prey' && (
+                                            <div>
+                                                <p>Predators: {envParams.predator_prey.num_predators}</p>
+                                                <p>Prey: {envParams.predator_prey.num_prey}</p>
+                                            </div>
+                                        )}
+                                        {environment === 'traffic' && (
+                                            <div>
+                                                <p>Vehicles: {envParams.traffic.num_vehicles}</p>
+                                            </div>
+                                        )}
+                                        {environment === 'resource' && (
+                                            <div>
+                                                <p>Agents: {envParams.resource.num_agents}</p>
+                                                <p>Resources: {envParams.resource.num_resources}</p>
+                                            </div>
+                                        )}
+                                        
+                                        <div style={{ marginTop: '20px' }}>
+                                            <h5 style={{ marginBottom: '10px' }}>Legend:</h5>
+                                            {agentPositions.length > 0 && (
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                                    {[...new Set(agentPositions.map(a => a.type))].map(type => {
+                                                        const agent = agentPositions.find(a => a.type === type);
+                                                        return (
+                                                            <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                                <div style={{
+                                                                    width: '12px',
+                                                                    height: '12px',
+                                                                    borderRadius: '50%',
+                                                                    backgroundColor: agent.color
+                                                                }}></div>
+                                                                <span style={{ fontSize: '0.9rem' }}>
+                                                                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'algorithm' && (
+                            <div className="algorithm-info">
+                                <div className="algorithm-title">
+                                    <div style={{ 
+                                        width: '12px', 
+                                        height: '12px', 
+                                        borderRadius: '50%', 
+                                        backgroundColor: algorithmInfo[algorithm].color 
+                                    }}></div>
+                                    {algorithmInfo[algorithm].name}
+                                    <span className="algorithm-badge">{algorithmInfo[algorithm].type}</span>
+                                </div>
+                                
+                                <div className="grid grid-2">
+                                    <div>
+                                        <h4 style={{ color: '#10b981', marginBottom: '15px' }}>Advantages</h4>
+                                        <ul className="feature-list">
+                                            {algorithmInfo[algorithm].advantages.map((advantage, index) => (
+                                                <li key={index}>
+                                                    <div className="dot"></div>
+                                                    {advantage}
+                                                </li>
+                                            ))}
+                                        </ul>
                                     </div>
                                     
-                                    <div className="flex items-center space-x-4">
-                                        <button
-                                            onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
-                                            className="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all duration-300"
-                                        >
-                                            <Globe className="w-5 h-5" />
-                                            <span className="font-medium">{language === 'zh' ? 'EN' : '中文'}</span>
-                                        </button>
-                                        
-                                        <a 
-                                            href="https://github.com/yourusername/marl-playground" 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                            className="flex items-center space-x-2 px-4 py-2 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl transition-all duration-300"
-                                        >
-                                            <Github className="w-5 h-5" />
-                                            <span className="font-medium">GitHub</span>
-                                        </a>
+                                    <div>
+                                        <h4 style={{ color: '#ef4444', marginBottom: '15px' }}>Limitations</h4>
+                                        <ul className="feature-list">
+                                            {algorithmInfo[algorithm].limitations.map((limitation, index) => (
+                                                <li key={index}>
+                                                    <div className="dot red"></div>
+                                                    {limitation}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div style={{ marginTop: '30px' }}>
+                                    <h4 style={{ color: '#60a5fa', marginBottom: '15px' }}>Current Parameters</h4>
+                                    <div className="grid grid-2">
+                                        {Object.entries(params[algorithm]).map(([key, value]) => (
+                                            <div key={key} style={{ 
+                                                padding: '10px', 
+                                                background: 'rgba(255,255,255,0.05)', 
+                                                borderRadius: '6px',
+                                                display: 'flex',
+                                                justifyContent: 'space-between'
+                                            }}>
+                                                <span>{key}</span>
+                                                <span style={{ fontFamily: 'monospace', color: '#60a5fa' }}>{value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
-                                        <button
-                                            onClick={exportData}
-                                            className="flex items-center space-x-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/30 rounded-xl transition-all duration-300"
-                                        >
-                                            <Download className="w-5 h-5" />
-                                            <span className="font-medium">{t.export}</span>
-                                        </button>
-
-                                        <button
-                                            onClick={shareConfig}
-                                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 rounded-xl transition-all duration-300"
-                                        >
-                                            <Share2 className="w-5 h-5" />
-                                            <span className="font-medium">{t.share}</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <p className="text-gray-300 text-lg max-w-4xl mx-auto leading-relaxed">
-                                    {t.description}
-                                </p>
-                            </header>
-
-                            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-                                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                                    <div className="flex items-center space-x-3">
-                                        <Activity className="w-6 h-6 text-blue-400" />
-                                        <div>
-                                            <p className="text-sm text-gray-400">{t.episode}</p>
-                                            <p className="text-xl font-bold text-blue-400">{episode}</p>
+                        {activeTab === 'analysis' && (
+                            <div>
+                                <h3 style={{ marginBottom: '20px' }}>Performance Analysis</h3>
+                                <div className="grid grid-2">
+                                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                                        <h4 style={{ color: '#60a5fa', marginBottom: '15px' }}>Parameter Impact</h4>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Learning Rate Impact:</strong>
+                                            <p style={{ fontSize: '0.9rem', color: '#94a3b8', marginTop: '5px' }}>
+                                                Higher values lead to faster but less stable convergence.
+                                                Lower values ensure stability but slower learning.
+                                            </p>
                                         </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                                    <div className="flex items-center space-x-3">
-                                        <Target className="w-6 h-6 text-green-400" />
-                                        <div>
-                                            <p className="text-sm text-gray-400">{t.reward}</p>
-                                            <p className="text-xl font-bold text-green-400">{currentStats.mean_reward.toFixed(1)}</p>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Gamma (Discount Factor):</strong>
+                                            <p style={{ fontSize: '0.9rem', color: '#94a3b8', marginTop: '5px' }}>
+                                                Values close to 1 prioritize long-term rewards.
+                                                Lower values focus on immediate rewards.
+                                            </p>
                                         </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                                    <div className="flex items-center space-x-3">
-                                        <BarChart3 className="w-6 h-6 text-purple-400" />
                                         <div>
-                                            <p className="text-sm text-gray-400">{t.success_rate}</p>
-                                            <p className="text-xl font-bold text-purple-400">{currentStats.success_rate.toFixed(1)}%</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                                    <div className="flex items-center space-x-3">
-                                        <Zap className="w-6 h-6 text-yellow-400" />
-                                        <div>
-                                            <p className="text-sm text-gray-400">{t.exploration}</p>
-                                            <p className="text-xl font-bold text-yellow-400">{currentStats.exploration_rate.toFixed(1)}%</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                                    <div className="flex items-center space-x-3">
-                                        <div className={`w-3 h-3 rounded-full ${isTraining ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
-                                        <div>
-                                            <p className="text-sm text-gray-400">Status</p>
-                                            <p className="text-lg font-bold">
-                                                {isTraining ? t.training_status : t.stopped_status}
+                                            <strong>Exploration vs Exploitation:</strong>
+                                            <p style={{ fontSize: '0.9rem', color: '#94a3b8', marginTop: '5px' }}>
+                                                Balance between trying new actions (exploration) and 
+                                                using known good actions (exploitation).
                                             </p>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-                                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                                    <div className="flex items-center space-x-2 mb-4">
-                                        <Brain className="w-5 h-5 text-blue-400" />
-                                        <h3 className="text-lg font-semibold">{t.algorithms}</h3>
-                                    </div>
-                                    <div className="space-y-3">
-                                        {algorithms.map(alg => (
-                                            <label key={alg.value} className="group flex items-center space-x-3 cursor-pointer p-3 rounded-lg hover:bg-white/5 transition-all duration-200">
-                                                <input
-                                                    type="radio"
-                                                    value={alg.value}
-                                                    checked={algorithm === alg.value}
-                                                    onChange={(e) => setAlgorithm(e.target.value)}
-                                                    className="w-4 h-4 text-blue-600"
-                                                />
-                                                <div className="flex-1">
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className="font-medium text-white group-hover:text-blue-300 transition-colors">
-                                                            {alg.label}
-                                                        </span>
-                                                        <div 
-                                                            className="w-3 h-3 rounded-full" 
-                                                            style={{ backgroundColor: algorithmInfo[alg.value].color }}
-                                                        ></div>
-                                                    </div>
-                                                    <p className="text-sm text-gray-400">{algorithmInfo[alg.value].type}</p>
-                                                </div>
-                                            </label>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                                    <div className="flex items-center space-x-2 mb-4">
-                                        <Users className="w-5 h-5 text-green-400" />
-                                        <h3 className="text-lg font-semibold">{t.environments}</h3>
-                                    </div>
-                                    <div className="space-y-3">
-                                        {environments.map(env => (
-                                            <label key={env.value} className="group flex items-center space-x-3 cursor-pointer p-3 rounded-lg hover:bg-white/5 transition-all duration-200">
-                                                <input
-                                                    type="radio"
-                                                    value={env.value}
-                                                    checked={environment === env.value}
-                                                    onChange={(e) => setEnvironment(e.target.value)}
-                                                    className="w-4 h-4 text-green-600"
-                                                />
-                                                <div className="flex-1">
-                                                    <span className="font-medium text-white group-hover:text-green-300 transition-colors block">
-                                                        {env.label}
-                                                    </span>
-                                                    <p className="text-sm text-gray-400 line-clamp-2">{env.desc}</p>
-                                                </div>
-                                            </label>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                                    <div className="flex items-center space-x-2 mb-4">
-                                        <TrendingUp className="w-5 h-5 text-purple-400" />
-                                        <h3 className="text-lg font-semibold">Training Control</h3>
-                                    </div>
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <button
-                                                onClick={isTraining ? stopTraining : startTraining}
-                                                className={`flex items-center justify-center space-x-2 px-4 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-                                                    isTraining 
-                                                        ? 'bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/25' 
-                                                        : 'bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/25'
-                                                }`}
-                                            >
-                                                {isTraining ? <Pause size={20} /> : <Play size={20} />}
-                                                <span>{isTraining ? t.pause : t.start}</span>
-                                            </button>
-                                            
-                                            <button
-                                                onClick={resetEnvironment}
-                                                className="flex items-center justify-center space-x-2 px-4 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg shadow-gray-600/25"
-                                            >
-                                                <RotateCcw size={20} />
-                                                <span>{t.reset}</span>
-                                            </button>
-                                        </div>
-                                        
-                                        <div className="space-y-2">
-                                            <label className="text-sm text-gray-400">Animation Speed</label>
-                                            <input
-                                                type="range"
-                                                min={50}
-                                                max={500}
-                                                step={50}
-                                                value={animationSpeed}
-                                                onChange={(e) => setAnimationSpeed(parseInt(e.target.value))}
-                                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                                            />
-                                            <div className="flex justify-between text-xs text-gray-500">
-                                                <span>Fast</span>
-                                                <span>Slow</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="flex items-center space-x-2">
-                                            <Settings className="w-5 h-5 text-orange-400" />
-                                            <h3 className="text-lg font-semibold">{t.parameters}</h3>
-                                        </div>
-                                        <button
-                                            onClick={() => setShowSettings(!showSettings)}
-                                            className="p-2 bg-gray-600 hover:bg-gray-700 rounded-lg transition-all duration-300 transform hover:scale-110"
-                                        >
-                                            <Settings size={16} />
-                                        </button>
-                                    </div>
                                     
-                                    {showSettings && (
-                                        <div className="space-y-4 max-h-80 overflow-y-auto custom-scrollbar">
-                                            <div>
-                                                <h4 className="font-medium text-blue-300 mb-3 flex items-center space-x-2">
-                                                    <span>Algorithm Parameters</span>
-                                                    <Info className="w-4 h-4" />
-                                                </h4>
-                                                {Object.entries(params[algorithm]).slice(0, 6).map(([key, value]) => {
-                                                    const range = getParamRange(key);
-                                                    return (
-                                                        <div key={key} className="space-y-2 mb-4">
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-gray-300">{key}</span>
-                                                                <span className="font-mono text-white bg-white/10 px-2 py-1 rounded">
-                                                                    {value}
-                                                                </span>
-                                                            </div>
-                                                            <input
-                                                                type="range"
-                                                                min={range.min}
-                                                                max={range.max}
-                                                                step={range.step}
-                                                                value={value}
-                                                                onChange={(e) => updateParam('alg', key, parseFloat(e.target.value))}
-                                                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                                                            />
-                                                        </div>
-                                                    );
-                                                })}
+                                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                                        <h4 style={{ color: '#10b981', marginBottom: '15px' }}>Algorithm Comparison</h4>
+                                        {Object.keys(params).map(alg => (
+                                            <div key={alg} style={{
+                                                padding: '10px',
+                                                marginBottom: '10px',
+                                                background: algorithm === alg ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255,255,255,0.05)',
+                                                borderRadius: '6px',
+                                                border: algorithm === alg ? '1px solid #3b82f6' : '1px solid transparent'
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px' }}>
+                                                    <div style={{
+                                                        width: '8px',
+                                                        height: '8px',
+                                                        borderRadius: '50%',
+                                                        backgroundColor: algorithmInfo[alg].color
+                                                    }}></div>
+                                                    <strong>{alg}</strong>
+                                                    {algorithm === alg && <span style={{ fontSize: '0.7rem', background: '#3b82f6', padding: '2px 6px', borderRadius: '10px' }}>Active</span>}
+                                                </div>
+                                                <p style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                                    {algorithmInfo[alg].type}
+                                                </p>
                                             </div>
-                                        </div>
-                                    )}
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-
-                            <div className="flex space-x-1 bg-white/10 backdrop-blur-lg rounded-xl p-1 mb-8 border border-white/20">
-                                {[
-                                    { id: 'overview', label: t.overview, icon: BarChart3, color: 'blue' },
-                                    { id: 'training', label: t.training, icon: TrendingUp, color: 'green' },
-                                    { id: 'environment', label: t.environment, icon: Users, color: 'purple' },
-                                    { id: 'algorithm', label: t.algorithm, icon: BookOpen, color: 'orange' },
-                                    { id: 'analysis', label: t.analysis, icon: Activity, color: 'pink' }
-                                ].map(tab => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-                                            activeTab === tab.id 
-                                                ? `bg-${tab.color}-600 text-white shadow-lg shadow-${tab.color}-600/25` 
-                                                : 'text-gray-300 hover:text-white hover:bg-white/10'
-                                        }`}
-                                    >
-                                        <tab.icon size={20} />
-                                        <span>{tab.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className="space-y-6">
-                                {activeTab === 'overview' && (
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                        <div className="lg:col-span-2 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                                            <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
-                                                <TrendingUp className="w-6 h-6 text-blue-400" />
-                                                <span>Performance Overview</span>
-                                            </h3>
-                                            <div className="h-80">
-                                                <ResponsiveContainer width="100%" height="100%">
-                                                    <LineChart data={trainingData}>
-                                                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                                                        <XAxis dataKey="episode" stroke="#9CA3AF" />
-                                                        <YAxis stroke="#9CA3AF" />
-                                                        <Tooltip 
-                                                            contentStyle={{ 
-                                                                backgroundColor: '#1F2937', 
-                                                                border: 'none', 
-                                                                borderRadius: '12px',
-                                                                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-                                                            }} 
-                                                        />
-                                                        <Legend />
-                                                        <Line 
-                                                            type="monotone" 
-                                                            dataKey="mean_reward" 
-                                                            stroke="#60A5FA" 
-                                                            strokeWidth={3} 
-                                                            name={t.reward} 
-                                                            dot={false}
-                                                        />
-                                                        <Line 
-                                                            type="monotone" 
-                                                            dataKey="success_rate" 
-                                                            stroke="#34D399" 
-                                                            strokeWidth={3} 
-                                                            name={t.success_rate} 
-                                                            dot={false}
-                                                        />
-                                                        <Line 
-                                                            type="monotone" 
-                                                            dataKey="exploration_rate" 
-                                                            stroke="#F59E0B" 
-                                                            strokeWidth={3} 
-                                                            name={t.exploration} 
-                                                            dot={false}
-                                                        />
-                                                    </LineChart>
-                                                </ResponsiveContainer>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                                            <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
-                                                <Activity className="w-6 h-6 text-purple-400" />
-                                                <span>Performance Radar</span>
-                                            </h3>
-                                            <div className="h-80">
-                                                <ResponsiveContainer width="100%" height="100%">
-                                                    <RadarChart data={performanceProfile}>
-                                                        <PolarGrid stroke="#374151" />
-                                                        <PolarAngleAxis dataKey="metric" tick={{ fontSize: 12, fill: '#9CA3AF' }} />
-                                                        <PolarRadiusAxis 
-                                                            angle={90} 
-                                                            domain={[0, 100]} 
-                                                            tick={{ fontSize: 10, fill: '#6B7280' }} 
-                                                        />
-                                                        <Radar
-                                                            name="Performance"
-                                                            dataKey="value"
-                                                            stroke="#8B5CF6"
-                                                            fill="#8B5CF6"
-                                                            fillOpacity={0.3}
-                                                            strokeWidth={2}
-                                                        />
-                                                    </RadarChart>
-                                                </ResponsiveContainer>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeTab === 'environment' && (
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                        <div className="lg:col-span-2 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                                            <h3 className="text-xl font-semibold mb-4">Environment Visualization ({gridSize}×{gridSize})</h3>
-                                            <div className="relative">
-                                                <div 
-                                                    className="grid bg-gray-800/50 rounded-lg p-4 border border-gray-600"
-                                                    style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)`, aspectRatio: '1' }}
-                                                >
-                                                    {Array.from({ length: gridSize * gridSize }).map((_, i) => (
-                                                        <div key={i} className="border border-gray-600/50 aspect-square bg-gray-700/20"></div>
-                                                    ))}
-                                                    
-                                                    {agentPositions.map(agent => (
-                                                        <div
-                                                            key={agent.id}
-                                                            className="absolute rounded-full transition-all duration-300 flex items-center justify-center text-xs font-bold text-white shadow-xl border-2 border-white/30 transform hover:scale-110"
-                                                            style={{
-                                                                left: `${(agent.x / gridSize) * 100}%`,
-                                                                top: `${(agent.y / gridSize) * 100}%`,
-                                                                width: `${100 / gridSize * 0.8}%`,
-                                                                height: `${100 / gridSize * 0.8}%`,
-                                                                backgroundColor: agent.color,
-                                                                transform: 'translate(-50%, -50%)',
-                                                                marginLeft: `${100 / gridSize / 2}%`,
-                                                                marginTop: `${100 / gridSize / 2}%`,
-                                                                boxShadow: `0 0 20px ${agent.color}40`
-                                                            }}
-                                                            title={`${agent.id} - (${agent.x}, ${agent.y})`}
-                                                        >
-                                                            {agent.type === 'predator' ? 'P' : 
-                                                             agent.type === 'prey' ? 'R' :
-                                                             agent.type === 'vehicle' ? 'V' :
-                                                             agent.type === 'resource' ? 'R' : 'A'}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-6">
-                                            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                                                <h3 className="text-xl font-semibold mb-4">Environment Info</h3>
-                                                <div className="space-y-3">
-                                                    <div>
-                                                        <h4 className="font-medium text-blue-300 mb-2">{environmentInfo[environment].name}</h4>
-                                                        <p className="text-sm text-gray-300">{environmentInfo[environment].description}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                                                <h3 className="text-xl font-semibold mb-4">Environment Config</h3>
-                                                <div className="space-y-3">
-                                                    {Object.entries(envParams[environment]).map(([key, value]) => (
-                                                        <div key={key} className="flex justify-between items-center p-2 bg-white/5 rounded">
-                                                            <span className="text-gray-300 text-sm">{key}</span>
-                                                            <span className="font-mono text-white bg-white/10 px-2 py-1 rounded text-sm">{value}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeTab === 'algorithm' && (
-                                    <div className="bg-white/10 backdrop-blur-lg rounded-xl p-8 border border-white/20">
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                            <div>
-                                                <div className="flex items-center space-x-3 mb-6">
-                                                    <div 
-                                                        className="w-4 h-4 rounded-full"
-                                                        style={{ backgroundColor: algorithmInfo[algorithm].color }}
-                                                    ></div>
-                                                    <h3 className="text-2xl font-bold">{algorithmInfo[algorithm].name}</h3>
-                                                </div>
-                                                
-                                                <div className="space-y-6">
-                                                    <div>
-                                                        <span className="text-blue-300 font-medium">Type: </span>
-                                                        <span className="bg-blue-600/20 px-3 py-1 rounded-full font-mono text-sm">
-                                                            {algorithmInfo[algorithm].type}
-                                                        </span>
-                                                    </div>
-                                                    
-                                                    <div>
-                                                        <span className="text-green-300 font-medium">Paper: </span>
-                                                        <p className="text-gray-300 text-sm mt-1 italic">{algorithmInfo[algorithm].paper}</p>
-                                                    </div>
-                                                    
-                                                    <div>
-                                                        <span className="text-purple-300 font-medium">Key Idea: </span>
-                                                        <p className="text-gray-300 text-sm mt-1 leading-relaxed">{algorithmInfo[algorithm].keyIdea}</p>
-                                                    </div>
-                                                    
-                                                    <div>
-                                                        <span className="text-orange-300 font-medium">Best For: </span>
-                                                        <span className="text-yellow-300 text-sm">{algorithmInfo[algorithm].bestFor}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-6">
-                                                <div>
-                                                    <h4 className="text-lg font-medium text-green-300 mb-3 flex items-center space-x-2">
-                                                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                                        <span>Advantages</span>
-                                                    </h4>
-                                                    <ul className="space-y-2">
-                                                        {algorithmInfo[algorithm].advantages.map((advantage, index) => (
-                                                            <li key={index} className="flex items-center space-x-3 p-2 bg-green-600/10 rounded-lg">
-                                                                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                                                <span className="text-gray-300 text-sm">{advantage}</span>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-
-                                                <div>
-                                                    <h4 className="text-lg font-medium text-red-300 mb-3 flex items-center space-x-2">
-                                                        <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                                                        <span>Limitations</span>
-                                                    </h4>
-                                                    <ul className="space-y-2">
-                                                        {algorithmInfo[algorithm].limitations.map((limitation, index) => (
-                                                            <li key={index} className="flex items-center space-x-3 p-2 bg-red-600/10 rounded-lg">
-                                                                <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                                                                <span className="text-gray-300 text-sm">{limitation}</span>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-
-                                                <div>
-                                                    <h4 className="text-lg font-medium text-blue-300 mb-3">Current Parameters</h4>
-                                                    <div className="grid grid-cols-1 gap-2">
-                                                        {Object.entries(params[algorithm]).slice(0, 6).map(([key, value]) => (
-                                                            <div key={key} className="flex justify-between p-3 bg-white/5 rounded-lg">
-                                                                <span className="text-gray-400 text-sm">{key}</span>
-                                                                <span className="font-mono text-white text-sm bg-white/10 px-2 py-1 rounded">{value}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             );
